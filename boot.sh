@@ -2,29 +2,29 @@
 
 set -e
 
-ascii_art='________                  __        ___.
-\_____  \   _____ _____  |  | ____ _\_ |__
- /   |   \ /     \\__   \ |  |/ /  |  \ __ \
-/    |    \  Y Y  \/ __ \|    <|  |  / \_\ \
-\_______  /__|_|  (____  /__|_ \____/|___  /
-        \/      \/     \/     \/         \/
+ascii_art='                                         /$$           /$$       /$$                                         /$$                         /$$                                             /$$                    
+                                        | $$          | $$      |__/                                        | $$                        | $$                                            | $$                    
+  /$$$$$$  /$$$$$$/$$$$   /$$$$$$   /$$$$$$$  /$$$$$$ | $$$$$$$  /$$  /$$$$$$  /$$$$$$$                     | $$$$$$$  /$$   /$$       /$$$$$$    /$$$$$$  /$$$$$$/$$$$  /$$   /$$  /$$$$$$$ /$$$$$$$   /$$$$$$ 
+ /$$__  $$| $$_  $$_  $$ |____  $$ /$$__  $$ /$$__  $$| $$__  $$| $$ |____  $$| $$__  $$       /$$$$$$      | $$__  $$| $$  | $$      |_  $$_/   /$$__  $$| $$_  $$_  $$| $$  | $$ /$$__  $$| $$__  $$ /$$__  $$
+| $$  \ $$| $$ \ $$ \ $$  /$$$$$$$| $$  | $$| $$$$$$$$| $$  \ $$| $$  /$$$$$$$| $$  \ $$      |______/      | $$  \ $$| $$  | $$        | $$    | $$  \ $$| $$ \ $$ \ $$| $$  | $$| $$  | $$| $$  \ $$| $$  \ $$
+| $$  | $$| $$ | $$ | $$ /$$__  $$| $$  | $$| $$_____/| $$  | $$| $$ /$$__  $$| $$  | $$                    | $$  | $$| $$  | $$        | $$ /$$| $$  | $$| $$ | $$ | $$| $$  | $$| $$  | $$| $$  | $$| $$  | $$
+|  $$$$$$/| $$ | $$ | $$|  $$$$$$$|  $$$$$$$|  $$$$$$$| $$$$$$$/| $$|  $$$$$$$| $$  | $$                    | $$$$$$$/|  $$$$$$$        |  $$$$/|  $$$$$$/| $$ | $$ | $$|  $$$$$$$|  $$$$$$$| $$  | $$|  $$$$$$$
+ \______/ |__/ |__/ |__/ \_______/ \_______/ \_______/|_______/ |__/ \_______/|__/  |__/                    |_______/  \____  $$         \___/   \______/ |__/ |__/ |__/ \____  $$ \_______/|__/  |__/ \____  $$
+                                                                                                                       /$$  | $$                                         /$$  | $$                     /$$  \ $$
+                                                                                                                      |  $$$$$$/                                        |  $$$$$$/                    |  $$$$$$/
+                                                                                                                       \______/                                          \______/                      \______/ 
 '
 
 echo -e "$ascii_art"
-echo "=> Omakub is for fresh Ubuntu 24.04+ installations only!"
+echo "=> Omadebian is for fresh Debian 13+ installations only!"
 echo -e "\nBegin installation (or abort with ctrl+c)..."
 
 sudo apt-get update >/dev/null
 sudo apt-get install -y git >/dev/null
 
-echo "Cloning Omakub..."
-rm -rf ~/.local/share/omakub
-git clone https://github.com/basecamp/omakub.git ~/.local/share/omakub >/dev/null
-if [[ $OMAKUB_REF != "master" ]]; then
-	cd ~/.local/share/omakub
-	git fetch origin "${OMAKUB_REF:-stable}" && git checkout "${OMAKUB_REF:-stable}"
-	cd -
-fi
+echo "Cloning Omadebian..."
+rm -rf ~/.local/share/omadebian
+git clone https://github.com/tomydng/omadebian.git ~/.local/share/omadebian >/dev/null
 
 echo "Installation starting..."
-source ~/.local/share/omakub/install.sh
+source ~/.local/share/omadebian/install.sh
