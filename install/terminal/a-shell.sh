@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Configure the bash shell using Omadebian defaults
-# [ -f ~/.bashrc ] && mv ~/.bashrc ~/.bashrc.bak
-# cp ~/.local/share/omadebian/configs/bashrc ~/.bashrc
+[ -f ~/.bashrc ] && mv ~/.bashrc ~/.bashrc.bak
+cp ~/.local/share/omadebian/configs/bashrc ~/.bashrc
 [ -f ~/.zshrc ] && mv ~/.zshrc ~/.zshrc.bak
 cp ~/.local/share/omadebian/configs/zshrc ~/.zshrc
 

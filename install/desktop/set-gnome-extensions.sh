@@ -78,4 +78,5 @@ gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-posi
 
 # Configure Clipboard Indicator
 gsettings set org.gnome.shell.extensions.clipboard-indicator history-size 15
+gsettings set org.gnome.shell.keybindings toggle-message-tray "@as []"
 gsettings set org.gnome.shell.extensions.clipboard-indicator toggle-menu "['<Super>v']"
