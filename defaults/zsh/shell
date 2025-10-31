@@ -1,5 +1,5 @@
 # History control
-shopt -s histappend
+setopt hist_append
 HISTCONTROL=ignoreboth
 HISTSIZE=32768
 HISTFILESIZE="${HISTSIZE}"
