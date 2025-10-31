@@ -5,6 +5,7 @@ Turn a fresh Debian installation into a fully-configured, beautiful, and modern 
 Watch the introduction video and read more at [omakub.org](https://omakub.org).
 
 ## Install
+
 ```
 eval "$(wget -qO- https://raw.githubusercontent.com/tomydng/omadebian/main/boot.sh)"
 ```
