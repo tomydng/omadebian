@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo apt install -y fzf ripgrep bat eza zoxide plocate apache2-utils fd-find
+sudo apt install -y tree fzf ripgrep bat eza zoxide plocate apache2-utils fd-find zip unzip rar unrar direnv git-delta

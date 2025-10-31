@@ -1,3 +1,3 @@
 #!/bin/bash
 
-for script in ~/.local/share/omakub/applications/*.sh; do source $script; done
+for script in ~/.local/share/omadebian/applications/*.sh; do source $script; done

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-OMAKUB_THEME_COLOR="magenta"
-OMAKUB_THEME_BACKGROUND="catppuccin/background.png"
-source $OMAKUB_PATH/themes/set-gnome-theme.sh
+OMADEBIAN_THEME_COLOR="magenta"
+OMADEBIAN_THEME_BACKGROUND="catppuccin/background.png"
+source $OMADEBIAN_PATH/themes/set-gnome-theme.sh

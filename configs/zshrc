@@ -1,0 +1,76 @@
+source ~/.local/share/omadebian/defaults/zsh/rc
+
+export ZSH="$HOME/.oh-my-zsh"
+source $ZSH/oh-my-zsh.sh
+
+# EXPORT
+export EDITOR="nvim"
+export SUDO_EDITOR="$EDITOR"
+export LESS='--chop-long-lines --HILITE-UNREAD --ignore-case --incsearch --jump-target=4 --LONG-PROMPT --no-init --quit-if-one-screen --RAW-CONTROL-CHARS --use-color --window=-4'
+export RIPGREP_CONFIG_PATH=~/.config/ripgrep/ripgreprc
+
+ZSH_THEME=""
+
+plugins=(
+  aliases
+  debian
+  git
+  docker
+  z
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  copypath
+  copyfile
+  dircycle
+  encode64
+  extract
+  safe-paste
+  direnv
+  you-should-use
+  python
+  pre-commit
+  fluxcd
+  helm
+  kops
+  kubectl
+  kubectx
+  mise
+)
+
+# Aliases
+alias ff="fzf --preview 'batcat --style=numbers --color=always {}'"
+alias fd='fdfind'
+alias python="python3"
+alias ld="lazydocker"
+alias lg="lazygit"
+alias zl="zellij"
+alias sshh="cat ~/.ssh/config | grep \"Host \" | cut -d \" \" -f 2 | sort"
+alias install='sudo apt install'
+alias update='sudo apt update'
+alias upgrade='sudo apt upgrade && sudo apt autoremove --purge'
+alias purge='sudo apt autoremove --purge'
+alias uu='echo "APT update & upgrade...\n " && sudo apt update && sudo apt upgrade -y && sudo apt autoremove --purge && update-all'
+alias df='df -h'
+alias free='free -h'
+alias myip="hostname -I | awk '{print $1}'; curl -s ifconfig.me && echo ' external ip'"
+alias x="exit"
+alias p="less"
+alias d='docker'
+alias bat='batcat'
+alias v="nvim"
+alias n="nvim"
+alias vim="nvim"
+alias vv="nvim ."
+alias cl="clear"
+alias s="zsh -l"
+alias vpn="sudo wg-quick up wg0"
+alias vpnd="sudo wg-quick down wg0"
+
+# Custom sources
+if [[ -f "$HOME/.custom_aliases" ]]; then
+    source "$HOME/.custom_aliases"
+fi
+
+if [[ -f "$HOME/.env" ]]; then
+    source "$HOME/.env"
+fi

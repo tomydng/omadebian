@@ -1,0 +1,4 @@
+source ~/.local/share/omadebian/defaults/zsh/shell
+source ~/.local/share/omadebian/defaults/zsh/aliases
+source ~/.local/share/omadebian/defaults/zsh/functions
+source ~/.local/share/omadebian/defaults/zsh/init
