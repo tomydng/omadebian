@@ -21,6 +21,12 @@ gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
 # Change input source
 gsettings set org.gnome.desktop.wm.keybindings switch-input-source "['<Control>space']"
 
+# Shortcut for opening Home folder
+gsettings get org.gnome.settings-daemon.plugins.media-keys home "['<Super>f']"
+
+# Screenshot interactive
+gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Control><Super>s']"
+
 # Use 6 fixed workspaces instead of dynamic mode
 gsettings set org.gnome.mutter dynamic-workspaces false
 gsettings set org.gnome.desktop.wm.preferences num-workspaces 10
