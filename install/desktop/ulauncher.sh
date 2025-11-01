@@ -1,9 +1,11 @@
 #!/bin/bash
 
-sudo add-apt-repository universe -y
-sudo add-apt-repository ppa:agornostal/ulauncher -y
-sudo apt update
-sudo apt install ulauncher -y
+cd /tmp
+ULAUNCHER_VERSION=$(curl -s https://api.github.com/repos/Ulauncher/Ulauncher/releases/latest | grep -Po '"tag_name": "\K[^"]*')
+wget -O ulauncher.deb "https://github.com/Ulauncher/Ulauncher/releases/download/${ULAUNCHER_VERSION}/ulauncher_${ULAUNCHER_VERSION}_all.deb"
+sudo apt install -y ./ulauncher.deb
+rm ulauncher.deb
+cd -
 
 # Start ulauncher to have it populate config before we overwrite
 mkdir -p ~/.config/autostart/
