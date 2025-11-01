@@ -1,7 +1,6 @@
 source ~/.local/share/omadebian/defaults/zsh/rc
 
 export ZSH="$HOME/.oh-my-zsh"
-source $ZSH/oh-my-zsh.sh
 
 # EXPORT
 export EDITOR="nvim"
@@ -37,7 +36,14 @@ plugins=(
   mise
 )
 
+source $ZSH/oh-my-zsh.sh
+
 # Aliases
+alias ls='eza -lh --group-directories-first --icons=auto'
+alias lsa='ls -a'
+alias lt='eza --tree --level=2 --long --icons --git'
+alias lta='lt -a'
+alias cd='z'
 alias ff="fzf --preview 'batcat --style=numbers --color=always {}'"
 alias fd='fdfind'
 alias python="python3"
