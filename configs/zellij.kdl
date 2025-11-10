@@ -1,4 +1,4 @@
-theme "tokyo-night"
+theme "default-theme"
 default_layout "compact"
 on_force_close "quit"
 
