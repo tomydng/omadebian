@@ -22,7 +22,7 @@ gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
 gsettings set org.gnome.desktop.wm.keybindings switch-input-source "['<Control>space']"
 
 # Shortcut for opening Home folder
-gsettings get org.gnome.settings-daemon.plugins.media-keys home "['<Super>f']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>f']"
 
 # Screenshot interactive
 gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Control><Super>s']"
