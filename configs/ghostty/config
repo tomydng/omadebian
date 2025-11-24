@@ -1,3 +1,6 @@
+# Config PATH: ~/.config/ghostty/config
+# Ghostty terminal emulator DOCS: https://ghostty.org/docs/config
+
 # Theme
 theme = GitHub Dark Default
 background-opacity = 0.85
