@@ -8,7 +8,7 @@ HISTFILESIZE="${HISTSIZE}"
 source /usr/share/bash-completion/bash_completion
 
 # Set complete path
-export PATH="./bin:$HOME/bin:$HOME/.local/bin:/usr/local/bin:$HOME/.local/share/omadebian/bin:/usr/local/go/bin:$HOME/.moon/bin:$PATH"
+export PATH="./bin:$HOME/bin:$HOME/.local/bin:/usr/local/bin:$HOME/.local/share/omadebian/bin:/usr/local/go/bin:$HOME/go/bin:$HOME/.moon/bin:$PATH"
 set +h
 
 export OMADEBIAN_PATH="$HOME/.local/share/omadebian"
