@@ -16,4 +16,5 @@ bindings = [
 ]
 
 [cursor]
-style = { shape = "Beam" }
+style = { shape = "Block" }
+
