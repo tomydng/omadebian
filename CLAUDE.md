@@ -17,7 +17,7 @@ omadebian/
 ├── boot.sh                        # Entry point – clone repo + chạy install.sh
 ├── install.sh                     # Orchestrator chính: hỏi lựa chọn, cài terminal/desktop
 ├── install/
-│   ├── first-run-choices.sh       # Gum prompts: optional apps (Spotify/Zoom/Dropbox), languages, databases
+│   ├── first-run-choices.sh       # Gum prompts: optional apps (Dropbox), languages, databases
 │   ├── identification.sh          # Git user config
 │   ├── check-version.sh           # Kiểm tra Debian version + kiến trúc x86
 │   ├── terminal.sh                # Chạy tất cả installer trong install/terminal/*.sh
@@ -29,27 +29,33 @@ omadebian/
 │   │   └── select-dev-language.sh / select-dev-storage.sh
 │   └── desktop/                   # Apps GNOME (chạy theo thứ tự alphabet)
 │       ├── a-flatpak.sh           # Setup Flatpak + Flathub – phải chạy trước app-* dùng flatpak
-│       ├── a-snap.sh              # Setup Snap (hiện không có app snap nào dùng)
-│       ├── app-alacritty.sh       # Terminal mặc định
+│       ├── a-snap.sh              # Setup Snap (dự phòng cho app snap sau này)
+│       ├── app-alacritty.sh       # Alacritty terminal + set làm default
+│       ├── app-bitwarden.sh       # Password manager (Flatpak)
 │       ├── app-brave.sh           # Brave browser (bắt buộc)
-│       ├── app-ghostty.sh         # Ghostty terminal qua APT ghostty-debian (bắt buộc)
-│       ├── app-vscode.sh          # VSCode qua APT Microsoft
+│       ├── app-bruno.sh           # API client (Flatpak)
 │       ├── app-chrome.sh          # Chrome
+│       ├── app-ghostty.sh         # Ghostty terminal qua APT ghostty-debian (bắt buộc)
+│       ├── app-gimp.sh            # Image editor (Flatpak)
+│       ├── app-obs-studio.sh      # Screen recording
+│       ├── app-postman.sh         # API client (Flatpak)
+│       ├── app-vscode.sh          # VSCode qua APT Microsoft
 │       ├── app-zed.sh             # Zed editor
-│       ├── app-gimp.sh / app-obs-studio.sh / ...
-│       └── select-optional-apps.sh  # Đọc $OMADEBIAN_FIRST_RUN_OPTIONAL_APPS → source từng app
-│           optional/              # Apps tuỳ chọn (Spotify, Zoom, Dropbox, Obsidian...)
+│       ├── set-gnome-*.sh         # GNOME settings, extensions, hotkeys, dock
+│       ├── select-optional-apps.sh  # Đọc $OMADEBIAN_FIRST_RUN_OPTIONAL_APPS → source từng app
+│       └── optional/              # Apps tuỳ chọn: Dropbox, Obsidian, Retroarch, Trayscale
 ├── configs/                       # Config files được copy vào ~/.config/ khi install
-│   ├── ghostty/config             # Ghostty: theme GitHub Dark, font CaskaydiaMono 11, block cursor
+│   ├── ghostty/config             # Ghostty: GitHub Dark, CaskaydiaMono 11, block cursor, SSH hostname
 │   ├── alacritty/                 # Alacritty multi-file config
 │   ├── neovim/                    # Neovim config
-│   └── zshrc, bashrc, starship.toml, zellij.kdl, btop.conf...
-├── themes/                        # Colour themes (mặc định: GitHub Dark Default)
+│   ├── starship.toml              # Prompt: hiện hostname khi SSH
+│   └── zshrc, bashrc, zellij.kdl, btop.conf, vscode.json...
 ├── defaults/                      # Shell dotfiles mặc định (bash/, zsh/) – set OMADEBIAN_PATH
-├── applications/                  # GNOME .desktop shortcuts
+├── applications/                  # GNOME .desktop shortcuts (About, Activity, Docker, Omadebian)
+│   └── icons/                     # Activity.png, Debian.png, Docker.png, Omadebian.png
 ├── scripts/                       # Utility scripts (sync-org.sh, toggle_panel.sh)
 ├── migrations/                    # Migration scripts theo timestamp
-└── uninstall/                     # Uninstall scripts
+└── uninstall/                     # Uninstall scripts cho các app đang dùng
 ```
 
 ## Thêm app mới
@@ -61,12 +67,12 @@ omadebian/
 
 ### App bắt buộc (cài cho tất cả)
 - Đặt script trong `install/desktop/*.sh` hoặc `install/terminal/*.sh`
-- Sẽ tự động được chạy vì `desktop.sh` và `terminal.sh` glob `*.sh` theo **thứ tự alphabet**
+- Tự động chạy vì `desktop.sh` và `terminal.sh` glob `*.sh` theo **thứ tự alphabet**
 - Dùng prefix `a-` nếu cần chạy trước các script khác (ví dụ `a-flatpak.sh`)
 
 ## Pattern cài đặt từ APT repo bên thứ ba
 
-Xem `install/desktop/optional/app-spotify.sh` làm mẫu:
+Xem `install/desktop/app-ghostty.sh` làm mẫu:
 ```bash
 if [ ! -f /etc/apt/sources.list.d/<repo>.list ]; then
   curl -fsSL <gpg-url> | sudo gpg --dearmor -o /usr/share/keyrings/<name>.gpg
@@ -86,14 +92,21 @@ Cài qua APT repo không chính thức của [dariogriffo/ghostty-debian](https:
 - APT source: `https://debian.griffo.io/apt`
 - Hỗ trợ: Debian Bookworm, Trixie, Sid
 
-Config: theme GitHub Dark Default, font CaskaydiaMono 11, background-opacity 0.95, block cursor, Alt+Arrow điều hướng pane.
+Config: GitHub Dark Default, CaskaydiaMono 11, background-opacity 0.95, block cursor, Alt+Arrow pane navigation.
+
+## Starship prompt
+
+Config: `configs/starship.toml`
+
+- Hiện `hostname` màu vàng khi đang trong SSH session (`ssh_only = true`)
+- Format: `[directory git_branch git_status] ❯`
 
 ## Biến môi trường quan trọng
 
 | Biến | Mô tả |
 |------|--------|
 | `OMADEBIAN_PATH` | Path tới `~/.local/share/omadebian` – set bởi `a-shell.sh` lúc install |
-| `OMADEBIAN_FIRST_RUN_OPTIONAL_APPS` | Danh sách optional apps được chọn (Spotify/Zoom/Dropbox) |
+| `OMADEBIAN_FIRST_RUN_OPTIONAL_APPS` | Optional apps được chọn (hiện chỉ còn Dropbox) |
 | `OMADEBIAN_FIRST_RUN_LANGUAGES` | Ngôn ngữ lập trình được chọn |
 | `OMADEBIAN_FIRST_RUN_DBS` | Databases được chọn |
 
@@ -104,10 +117,3 @@ Config: theme GitHub Dark Default, font CaskaydiaMono 11, background-opacity 0.9
 - User phải có quyền `sudo` và **không phải root**
 - Kết nối internet ổn định
 - zsh / oh-my-zsh nên được cài trước
-
-## Vấn đề đã biết
-
-- `check-version.sh` dùng `exit 1` thay vì `return 1` — khi được `source`, lệnh này sẽ kill cả terminal session thay vì chỉ dừng install
-- Không có cơ chế sudo keep-alive — nếu install kéo dài >15 phút, sudo timeout sẽ khiến script bị treo chờ mật khẩu
-- `a-snap.sh` vẫn chạy dù hiện không có app snap nào
-- `lsb_release` có thể chưa được cài trên Debian minimal (cần cho ghostty APT source)
