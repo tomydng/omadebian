@@ -25,8 +25,12 @@ omadebian/
 │   ├── terminal/                  # Tools CLI (chạy theo thứ tự alphabet)
 │   │   ├── required/app-gum.sh    # Gum (TUI prompts) – cài trước tiên
 │   │   ├── a-shell.sh             # Cấu hình shell, set OMADEBIAN_PATH – phải chạy trước
-│   │   ├── docker.sh, fonts.sh, libraries.sh, mise.sh...
-│   │   └── select-dev-language.sh / select-dev-storage.sh
+│   │   ├── libraries.sh               # Build tools chung (build-essential, libssl, libpq, pipx...)
+│   │   ├── docker.sh, fonts.sh, mise.sh...
+│   │   ├── select-dev-language.sh     # Cài language runtime theo lựa chọn (Node, Go, Python, Rust...)
+│   │   └── select-dev-storage.sh      # Chạy DB Docker + cài client libs theo lựa chọn
+│   │                                  # MySQL → libmariadb-dev + mariadb-client (= MySQL trên Debian)
+│   │                                  # Redis → redis-tools
 │   └── desktop/                   # Apps GNOME (chạy theo thứ tự alphabet)
 │       ├── a-flatpak.sh           # Setup Flatpak + Flathub – phải chạy trước app-* dùng flatpak
 │       ├── a-snap.sh              # Setup Snap (dự phòng cho app snap sau này)
@@ -46,7 +50,7 @@ omadebian/
 │       └── optional/              # Apps tuỳ chọn: Dropbox, Obsidian, Retroarch, Trayscale
 ├── configs/                       # Config files được copy vào ~/.config/ khi install
 │   ├── ghostty/config             # Ghostty: GitHub Dark, CaskaydiaMono 11, block cursor, SSH hostname
-│   ├── alacritty/                 # Alacritty multi-file config
+│   ├── alacritty/                 # Alacritty multi-file config (theme.toml = GNOME Terminal Default)
 │   ├── neovim/                    # Neovim config
 │   ├── starship.toml              # Prompt: hiện hostname khi SSH
 │   └── zshrc, bashrc, zellij.kdl, btop.conf, vscode.json...
