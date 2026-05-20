@@ -7,7 +7,7 @@ cp ~/.local/share/omadebian/configs/alacritty.toml ~/.config/alacritty/alacritty
 cp ~/.local/share/omadebian/configs/alacritty/shared.toml ~/.config/alacritty/shared.toml
 cp ~/.local/share/omadebian/configs/alacritty/pane.toml ~/.config/alacritty/pane.toml
 cp ~/.local/share/omadebian/configs/alacritty/btop.toml ~/.config/alacritty/btop.toml
-cp ~/.local/share/omadebian/themes/default-theme/alacritty.toml ~/.config/alacritty/theme.toml
+cp ~/.local/share/omadebian/configs/alacritty/theme.toml ~/.config/alacritty/theme.toml
 cp ~/.local/share/omadebian/configs/alacritty/fonts/CaskaydiaMono.toml ~/.config/alacritty/font.toml
 cp ~/.local/share/omadebian/configs/alacritty/font-size.toml ~/.config/alacritty/font-size.toml
 
