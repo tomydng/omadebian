@@ -1,3 +1,3 @@
 #!/bin/bash
 
-curl https://zed.dev/install.sh | sh
+curl -f https://zed.dev/install.sh | sh
