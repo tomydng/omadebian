@@ -6,6 +6,11 @@ set -e
 # Give people a chance to retry running the installation
 trap 'echo "Omadebian installation failed! You can retry by running: source ~/.local/share/omadebian/install.sh"' ERR
 
+# Keep sudo credentials alive for the entire installation
+sudo -v
+( while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done ) 2>/dev/null &
+SUDO_KEEPALIVE_PID=$!
+
 # Check the distribution name and version and abort if incompatible
 source ~/.local/share/omadebian/install/check-version.sh
 
@@ -36,3 +41,6 @@ else
   echo "Only installing terminal tools..."
   source ~/.local/share/omadebian/install/terminal.sh
 fi
+
+# Stop sudo keep-alive
+kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
