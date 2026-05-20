@@ -25,12 +25,13 @@ omadebian/
 │   ├── terminal/                  # Tools CLI (chạy theo thứ tự alphabet)
 │   │   ├── required/app-gum.sh    # Gum (TUI prompts) – cài trước tiên
 │   │   ├── a-shell.sh             # Cấu hình shell, set OMADEBIAN_PATH – phải chạy trước
-│   │   ├── libraries.sh               # Build tools chung (build-essential, libssl, libpq, pipx...)
+│   │   ├── libraries.sh               # Build tools + client libs bắt buộc:
+│   │   │                              # build-essential, libssl, libpq, pipx...
+│   │   │                              # libmariadb-dev + mariadb-client (= MySQL client trên Debian)
+│   │   │                              # redis-tools – luôn cài, bất kể DB cài bằng cách nào
 │   │   ├── docker.sh, fonts.sh, mise.sh...
 │   │   ├── select-dev-language.sh     # Cài language runtime theo lựa chọn (Node, Go, Python, Rust...)
-│   │   └── select-dev-storage.sh      # Chạy DB Docker + cài client libs theo lựa chọn
-│   │                                  # MySQL → libmariadb-dev + mariadb-client (= MySQL trên Debian)
-│   │                                  # Redis → redis-tools
+│   │   └── select-dev-storage.sh      # Chạy DB trong Docker theo lựa chọn (MySQL, Redis, PostgreSQL)
 │   └── desktop/                   # Apps GNOME (chạy theo thứ tự alphabet)
 │       ├── a-flatpak.sh           # Setup Flatpak + Flathub – phải chạy trước app-* dùng flatpak
 │       ├── a-snap.sh              # Setup Snap (dự phòng cho app snap sau này)
