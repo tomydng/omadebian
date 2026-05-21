@@ -4,18 +4,13 @@
 if [[ -v OMADEBIAN_FIRST_RUN_LANGUAGES ]]; then
   languages=$OMADEBIAN_FIRST_RUN_LANGUAGES
 else
-  AVAILABLE_LANGUAGES=("Ruby on Rails" "Node.js" "Go" "PHP" "Python" "Elixir" "Rust" "Java")
+  AVAILABLE_LANGUAGES=("Node.js" "Go" "PHP" "Python" "Elixir" "Rust" "Java")
   languages=$(gum choose "${AVAILABLE_LANGUAGES[@]}" --no-limit --height 10 --header "Select programming languages")
 fi
 
 if [[ -n "$languages" ]]; then
   for language in $languages; do
     case $language in
-    Ruby)
-      mise use --global ruby@latest
-      mise settings add idiomatic_version_file_enable_tools ruby
-      mise x ruby -- gem install rails --no-document
-      ;;
     Node.js)
       mise use --global node@lts
       ;;

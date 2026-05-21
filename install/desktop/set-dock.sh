@@ -3,7 +3,7 @@
 # Favorite apps for dock
 apps=(
 	"google-chrome.desktop"
-	"Alacritty.desktop"
+	"com.mitchellh.ghostty.desktop"
 	"code.desktop"
 	"Activity.desktop"
 	"Docker.desktop"
