@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sudo apt install kubectx
+sudo apt install -y kubectx
 echo "kubectx installed successfully."
 

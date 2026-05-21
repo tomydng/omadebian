@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 cd /tmp
 
 SIMPLENOTE_VERSION=$(curl -s https://api.github.com/repos/Automattic/simplenote-electron/releases/latest | grep -Po '"tag_name": "v\K[^"]*')

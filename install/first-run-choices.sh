@@ -6,7 +6,7 @@ if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then
   export OMADEBIAN_FIRST_RUN_OPTIONAL_APPS=$(gum choose "${OPTIONAL_APPS[@]}" --no-limit --height 3 --header "Select optional apps" | tr ' ' '-')
 fi
 
-AVAILABLE_LANGUAGES=("Ruby on Rails" "Node.js" "Go" "PHP" "Python" "Elixir" "Rust" "Java")
+AVAILABLE_LANGUAGES=("Node.js" "Go" "PHP" "Python" "Elixir" "Rust" "Java")
 SELECTED_LANGUAGES="Node.js","Python","Go","Rust"
 export OMADEBIAN_FIRST_RUN_LANGUAGES=$(gum choose "${AVAILABLE_LANGUAGES[@]}" --no-limit --selected "$SELECTED_LANGUAGES" --height 10 --header "Select programming languages")
 
