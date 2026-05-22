@@ -20,9 +20,6 @@ gsettings set org.gnome.desktop.wm.keybindings toggle-fullscreen "['<Shift>F11']
 # Switch windows
 gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
 
-# Change input source
-gsettings set org.gnome.desktop.wm.keybindings switch-input-source "['<Control>space']"
-
 # Shortcut for opening Home folder
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>f']"
 
@@ -85,7 +82,6 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/ binding '<Super><Shift>s'
 
 # custom5: Toggle Panel — Shift+Super+Space
-gsettings set org.gnome.desktop.wm.keybindings switch-input-source-backward "@as []"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/ name 'Toggle Panel'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/ command "/bin/sh $HOME/.local/share/omadebian/scripts/toggle_panel.sh"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/ binding '<Shift><Super>space'
