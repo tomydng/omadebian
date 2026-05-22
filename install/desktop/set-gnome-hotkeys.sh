@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Clear GNOME default Super+Space (switch-input-source) to free it for Ulauncher
+gsettings set org.gnome.desktop.wm.keybindings switch-input-source "@as []"
+gsettings set org.gnome.desktop.wm.keybindings switch-input-source-backward "@as []"
+
 # Alt+F4 is very cumbersome
 gsettings set org.gnome.desktop.wm.keybindings close "['<Super>w']"
 
