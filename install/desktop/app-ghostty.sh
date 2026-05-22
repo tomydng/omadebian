@@ -13,4 +13,4 @@ sudo apt update
 sudo apt install -y ghostty
 
 mkdir -p ~/.config/ghostty
-cp ~/.local/share/omadebian/configs/ghostty/config ~/.config/ghostty/config
+cp "$OMADEBIAN_PATH/configs/ghostty/config" ~/.config/ghostty/config

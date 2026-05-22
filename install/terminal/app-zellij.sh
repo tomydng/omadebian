@@ -8,4 +8,4 @@ rm zellij.tar.gz zellij
 cd -
 
 mkdir -p ~/.config/zellij/themes
-[ ! -f "$HOME/.config/zellij/config.kdl" ] && cp ~/.local/share/omadebian/configs/zellij.kdl ~/.config/zellij/config.kdl || true
+[ ! -f "$HOME/.config/zellij/config.kdl" ] && cp "$OMADEBIAN_PATH/configs/zellij.kdl" ~/.config/zellij/config.kdl || true

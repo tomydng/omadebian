@@ -7,9 +7,8 @@ sudo apt install -y ./ulauncher.deb
 rm ulauncher.deb
 cd -
 
-# Start ulauncher to have it populate config before we overwrite
 mkdir -p ~/.config/autostart/
-cp ~/.local/share/omadebian/configs/ulauncher.desktop ~/.config/autostart/ulauncher.desktop
+cp "$OMADEBIAN_PATH/configs/ulauncher.desktop" ~/.config/autostart/ulauncher.desktop
 gtk-launch ulauncher.desktop >/dev/null 2>&1
-sleep 2 # ensure enough time for ulauncher to set defaults
-cp ~/.local/share/omadebian/configs/ulauncher.json ~/.config/ulauncher/settings.json
+sleep 2
+cp "$OMADEBIAN_PATH/configs/ulauncher.json" ~/.config/ulauncher/settings.json

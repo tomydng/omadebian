@@ -2,4 +2,4 @@
 
 curl -sS https://starship.rs/install.sh | sh -s -- -y
 
-cp ~/.local/share/omadebian/configs/starship.toml ~/.config/starship.toml
+cp "$OMADEBIAN_PATH/configs/starship.toml" ~/.config/starship.toml

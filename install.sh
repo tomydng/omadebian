@@ -1,46 +1,33 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export OMADEBIAN_PATH="$SCRIPT_DIR"
 
-# Give people a chance to retry running the installation
-trap 'echo "Omadebian installation failed! You can retry by running: source ~/.local/share/omadebian/install.sh"' ERR
-
-# Keep sudo credentials alive for the entire installation
 sudo -v
 ( while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done ) 2>/dev/null &
 SUDO_KEEPALIVE_PID=$!
+trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true' EXIT
 
-# Check the distribution name and version and abort if incompatible
-source ~/.local/share/omadebian/install/check-version.sh
+source "$OMADEBIAN_PATH/install/check-version.sh" || { echo "Unsupported system. Aborting."; exit 1; }
 
-# Ask for app choices
+echo "Installing gum for interactive prompts..."
+bash "$OMADEBIAN_PATH/install/terminal/required/app-gum.sh"
+
 echo "Get ready to make a few choices..."
-source ~/.local/share/omadebian/install/terminal/required/app-gum.sh >/dev/null
-source ~/.local/share/omadebian/install/first-run-choices.sh
-source ~/.local/share/omadebian/install/identification.sh
+source "$OMADEBIAN_PATH/install/first-run-choices.sh"
+source "$OMADEBIAN_PATH/install/identification.sh"
 
-# Desktop software and tweaks will only be installed if we're running Gnome
 if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then
-  # Ensure computer doesn't go to sleep or lock while installing
   gsettings set org.gnome.desktop.screensaver lock-enabled false
   gsettings set org.gnome.desktop.session idle-delay 0
 
   echo "Installing terminal and desktop tools..."
+  bash "$OMADEBIAN_PATH/install/terminal.sh"
+  bash "$OMADEBIAN_PATH/install/desktop.sh"
 
-  # Install terminal tools
-  source ~/.local/share/omadebian/install/terminal.sh
-
-  # Install desktop tools and tweaks
-  source ~/.local/share/omadebian/install/desktop.sh
-
-  # Revert to normal idle and lock settings
   gsettings set org.gnome.desktop.screensaver lock-enabled true
   gsettings set org.gnome.desktop.session idle-delay 300
 else
   echo "Only installing terminal tools..."
-  source ~/.local/share/omadebian/install/terminal.sh
+  bash "$OMADEBIAN_PATH/install/terminal.sh"
 fi
-
-# Stop sudo keep-alive
-kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
