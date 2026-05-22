@@ -48,7 +48,7 @@ omadebian/
 │       ├── app-zed.sh             # Zed editor
 │       ├── set-gnome-*.sh         # GNOME settings, extensions, hotkeys, dock
 │       ├── select-optional-apps.sh  # Đọc $OMADEBIAN_FIRST_RUN_OPTIONAL_APPS → source từng app
-│       └── optional/              # Apps tuỳ chọn: Dropbox, Obsidian, Retroarch, Trayscale
+│       └── optional/              # Apps tuỳ chọn: Dropbox, Joplin, Obsidian, Simplenote, Trayscale, xpipe
 ├── configs/                       # Config files được copy vào ~/.config/ khi install
 │   ├── ghostty/config             # Ghostty: GitHub Dark, CaskaydiaMono 11, block cursor, SSH hostname
 │   ├── alacritty/                 # Alacritty multi-file config (theme.toml = GNOME Terminal Default)
@@ -59,7 +59,6 @@ omadebian/
 ├── applications/                  # GNOME .desktop shortcuts (About, Activity, Docker, Omadebian)
 │   └── icons/                     # Activity.png, Debian.png, Docker.png, Omadebian.png
 ├── scripts/                       # Utility scripts (sync-org.sh, toggle_panel.sh)
-├── migrations/                    # Migration scripts theo timestamp
 └── uninstall/                     # Uninstall scripts cho các app đang dùng
 ```
 

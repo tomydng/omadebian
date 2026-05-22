@@ -1,5 +1,0 @@
-include "%H/.local/share/omadebian/defaults/xcompose"
-
-# Identification
-<Multi_key> <space> <n> : "$OMADEBIAN_USER_NAME"
-<Multi_key> <space> <e> : "$OMADEBIAN_USER_EMAIL"
