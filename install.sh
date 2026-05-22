@@ -10,13 +10,6 @@ trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true' EXIT
 
 source "$OMADEBIAN_PATH/install/check-version.sh" || { echo "Unsupported system. Aborting."; exit 1; }
 
-echo "Installing gum for interactive prompts..."
-bash "$OMADEBIAN_PATH/install/terminal/required/app-gum.sh"
-
-echo "Get ready to make a few choices..."
-source "$OMADEBIAN_PATH/install/first-run-choices.sh"
-source "$OMADEBIAN_PATH/install/identification.sh"
-
 if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then
   gsettings set org.gnome.desktop.screensaver lock-enabled false
   gsettings set org.gnome.desktop.session idle-delay 0

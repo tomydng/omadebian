@@ -3,9 +3,6 @@
 sudo apt install -y gnome-shell-extension-manager gir1.2-gtop-2.0 gir1.2-clutter-1.0
 pipx install gnome-extensions-cli --system-site-packages
 
-# Pause to assure user is ready to accept confirmations
-gum confirm "To install Gnome extensions, you need to accept some confirmations. Ready?"
-
 # Install new extensions
 gext install tactile@lundal.io
 gext install just-perfection-desktop@just-perfection

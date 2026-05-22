@@ -88,11 +88,8 @@ run "$OMADEBIAN_PATH/install/terminal/app-kubectl.sh"
 # Tailscale
 run "$OMADEBIAN_PATH/install/terminal/app-tailscale.sh"
 
+# Ollama (local LLM runner)
+curl -fsSL https://ollama.com/install.sh | sh || true
+
 # fcitx5 (Vietnamese input)
 run "$OMADEBIAN_PATH/install/terminal/app-fcitx5-unikey.sh"
-
-# Language runtimes (selected by user)
-run "$OMADEBIAN_PATH/install/terminal/select-dev-language.sh"
-
-# Databases in Docker (selected by user)
-run "$OMADEBIAN_PATH/install/terminal/select-dev-storage.sh"

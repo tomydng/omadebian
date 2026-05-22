@@ -47,12 +47,12 @@ run "$OMADEBIAN_PATH/install/desktop/set-gnome-hotkeys.sh"
 run "$OMADEBIAN_PATH/install/desktop/set-gnome-extensions.sh"
 run "$OMADEBIAN_PATH/install/desktop/set-dock.sh"
 
-# Optional apps (user selection from first-run-choices)
-bash "$OMADEBIAN_PATH/install/desktop/select-optional-apps.sh" || true
-
 # Custom GNOME application shortcuts
 for script in "$OMADEBIAN_PATH/applications/"*.sh; do
   bash "$script" || true
 done
 
-gum confirm "Ready to reboot for all settings to take effect?" && sudo reboot || true
+echo ""
+echo "Installation complete. Reboot to apply all settings."
+read -rp "Reboot now? [y/N] " choice
+[[ "$choice" =~ ^[Yy]$ ]] && sudo reboot || true
