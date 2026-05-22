@@ -6,6 +6,9 @@ mkdir -p ~/.config/fcitx5
 cp "$OMADEBIAN_PATH/configs/fcitx5/config" ~/.config/fcitx5/config
 cp "$OMADEBIAN_PATH/configs/fcitx5/profile" ~/.config/fcitx5/profile
 
+# Set fcitx5 as the default input method for the session
+im-config -n fcitx5
+
 # Let GNOME handle Ctrl+Space globally and signal fcitx5 via Wayland IM protocol
 gsettings set org.gnome.desktop.wm.keybindings switch-input-source "['<Control>space']"
 gsettings set org.gnome.desktop.wm.keybindings switch-input-source-backward "@as []"
