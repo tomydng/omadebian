@@ -120,4 +120,4 @@ Config: `configs/starship.toml`
 - GNOME desktop (nếu muốn cài desktop apps)
 - User phải có quyền `sudo` và **không phải root**
 - Kết nối internet ổn định
-- zsh / oh-my-zsh nên được cài trước
+- zsh nên được cài trước
