@@ -1,4 +1,0 @@
-#!/bin/bash
-
-source $OMADEBIAN_PATH/bin/omadebian-sub/header.sh
-source $OMADEBIAN_PATH/bin/omadebian-sub/menu.sh
