@@ -19,6 +19,10 @@ sudo apt install -y zsh
 chsh -s "$(which zsh)" "$USER" 2>/dev/null || true
 run "$OMADEBIAN_PATH/install/terminal/a-shell.sh"
 
+# Show asterisks when typing sudo password
+echo 'Defaults pwfeedback' | sudo tee /etc/sudoers.d/pwfeedback > /dev/null
+sudo chmod 440 /etc/sudoers.d/pwfeedback
+
 # Build tools and libraries
 sudo apt install -y \
   build-essential pkg-config autoconf clang rustc pipx \
