@@ -50,10 +50,6 @@ sudo apt install -y wireguard
 # kubectx
 sudo apt install -y kubectx
 
-# ripgrep config
-mkdir -p ~/.config/ripgrep
-[ ! -f "$HOME/.config/ripgrep/ripgreprc" ] && cp "$OMADEBIAN_PATH/configs/ripgrep/ripgreprc" ~/.config/ripgrep/ripgreprc || true
-
 # tldr (simplified man pages)
 pipx install tldr || true
 

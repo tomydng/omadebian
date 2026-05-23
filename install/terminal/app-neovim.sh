@@ -9,8 +9,6 @@ sudo cp -R nvim-linux-x86_64/share /usr/local/
 rm -rf nvim-linux-x86_64 nvim.tar.gz
 cd -
 
-if [ ! -d "$HOME/.config/nvim" ]; then
-  mkdir -p ~/.config/nvim/plugin/after
-  cp "$OMADEBIAN_PATH/configs/neovim/transparency.lua" ~/.config/nvim/plugin/after/
-  cp "$OMADEBIAN_PATH/configs/neovim/init.lua" ~/.config/nvim/init.lua
-fi
+# Transparency plugin (makes neovim background transparent)
+mkdir -p ~/.config/nvim/plugin/after
+cp "$OMADEBIAN_PATH/configs/neovim/transparency.lua" ~/.config/nvim/plugin/after/
