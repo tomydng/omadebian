@@ -15,6 +15,8 @@ sudo apt upgrade -y
 sudo apt install -y curl git unzip lsb-release
 
 # Shell (zsh)
+sudo apt install -y zsh zsh-autosuggestions zsh-syntax-highlighting
+chsh -s "$(which zsh)" "$USER" 2>/dev/null || true
 run "$OMADEBIAN_PATH/install/terminal/a-shell.sh"
 
 # Build tools and libraries

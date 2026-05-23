@@ -1,42 +1,17 @@
 source ~/.local/share/omadebian/defaults/zsh/rc
 
-export ZSH="$HOME/.oh-my-zsh"
-
 # EXPORT
 export EDITOR="nvim"
 export SUDO_EDITOR="$EDITOR"
 export LESS='--chop-long-lines --HILITE-UNREAD --ignore-case --incsearch --jump-target=4 --LONG-PROMPT --no-init --quit-if-one-screen --RAW-CONTROL-CHARS --use-color --window=-4'
 export RIPGREP_CONFIG_PATH=~/.config/ripgrep/ripgreprc
 
-ZSH_THEME=""
+# Plugins
+[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-plugins=(
-  aliases
-  debian
-  git
-  docker
-  z
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  copypath
-  copyfile
-  dircycle
-  encode64
-  extract
-  safe-paste
-  direnv
-  you-should-use
-  python
-  pre-commit
-  fluxcd
-  helm
-  kops
-  kubectl
-  kubectx
-  mise
-)
-
-source $ZSH/oh-my-zsh.sh
+# Completion
+autoload -Uz compinit && compinit
 
 # Aliases
 alias ls='eza -lh --group-directories-first --icons=auto'
@@ -72,10 +47,5 @@ alias vpn="sudo wg-quick up wg0"
 alias vpnd="sudo wg-quick down wg0"
 
 # Custom sources
-if [[ -f "$HOME/.custom_aliases" ]]; then
-    source "$HOME/.custom_aliases"
-fi
-
-if [[ -f "$HOME/.env" ]]; then
-    source "$HOME/.env"
-fi
+[ -f "$HOME/.custom_aliases" ] && source "$HOME/.custom_aliases"
+[ -f "$HOME/.env" ] && source "$HOME/.env"
