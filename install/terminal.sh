@@ -16,7 +16,7 @@ sudo apt install -y curl git unzip lsb-release
 
 # Shell (zsh)
 sudo apt install -y zsh
-chsh -s "$(which zsh)" "$USER" 2>/dev/null || true
+sudo usermod -s "$(which zsh)" "$USER"
 run "$OMADEBIAN_PATH/install/terminal/a-shell.sh"
 
 # Show asterisks when typing sudo password
