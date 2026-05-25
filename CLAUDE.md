@@ -68,6 +68,7 @@ omadebian/
 └── scripts/
     ├── setup-folders.sh      # Tạo cấu trúc thư mục workspaces
     ├── setup-wol.sh          # Bật Wake-on-LAN + tạo systemd service
+    ├── no-suspend.sh         # Mask sleep targets + logind override, dùng cho máy headless/WOL
     ├── sync-org.sh
     └── toggle_panel.sh       # Toggle GNOME top bar (dùng bởi Shift+Super+Space)
 ```
