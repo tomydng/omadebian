@@ -18,3 +18,7 @@ powerprofilesctl set performance 2>/dev/null || true
 # Disable suspend/sleep (on AC and battery)
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing'
+
+# Alt+Tab shows all workspaces; Super+Tab shows only current workspace
+gsettings set org.gnome.shell.app-switcher current-workspace-only true
+gsettings set org.gnome.shell.window-switcher current-workspace-only false

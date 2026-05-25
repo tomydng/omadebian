@@ -21,8 +21,11 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys play "['<Super><Alt>m
 # Full-screen with title/navigation bar
 gsettings set org.gnome.desktop.wm.keybindings toggle-fullscreen "['<Shift>F11']"
 
-# Switch windows
+# Alt+Tab = all workspaces; Super+Tab = current workspace only
 gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Shift><Alt>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings switch-applications "['<Super>Tab']"
+gsettings set org.gnome.desktop.wm.keybindings switch-applications-backward "['<Shift><Super>Tab']"
 
 # Shortcut for opening Home folder
 gsettings set org.gnome.settings-daemon.plugins.media-keys home "['<Super>f']"
