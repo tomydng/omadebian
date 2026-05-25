@@ -12,6 +12,6 @@ HandleHibernateKey=ignore
 IdleAction=ignore
 EOF
 
-sudo systemctl restart systemd-logind
+sudo kill -HUP $(pidof systemd-logind)
 
 echo "Suspend/sleep fully disabled."
