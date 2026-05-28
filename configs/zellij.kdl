@@ -1,5 +1,5 @@
 theme "default-theme"
-default_layout "compact"
+default_layout "default"
 on_force_close "quit"
 
 default_mode "locked"
