@@ -7,7 +7,6 @@ apps=(
 	"code.desktop"
 	"Activity.desktop"
 	"Docker.desktop"
-	"Omadebian.desktop"
 	"org.gnome.Settings.desktop"
 	"org.gnome.Nautilus.desktop"
 	"localsend_app.desktop"
