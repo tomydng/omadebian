@@ -15,7 +15,6 @@ EnumerateGroupBackwardKeys=
 ModifierOnlyKeyTimeout=249
 
 [Hotkey/TriggerKeys]
-0=Control+space
 
 [Hotkey/EnumerateGroupForwardKeys]
 
