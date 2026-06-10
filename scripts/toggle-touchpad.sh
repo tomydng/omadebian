@@ -1,10 +1,12 @@
 #!/bin/bash
 
+notify() { command -v notify-send &>/dev/null && notify-send "$1"; }
+
 STATE=$(gsettings get org.gnome.desktop.peripherals.touchpad send-events)
 if [ "$STATE" = "'enabled'" ]; then
     gsettings set org.gnome.desktop.peripherals.touchpad send-events disabled
-    notify-send "Touchpad OFF"
+    notify "Touchpad OFF"
 else
     gsettings set org.gnome.desktop.peripherals.touchpad send-events enabled
-    notify-send "Touchpad ON"
+    notify "Touchpad ON"
 fi
