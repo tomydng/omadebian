@@ -1,6 +1,9 @@
 #!/bin/bash
 
-notify() { command -v notify-send &>/dev/null && notify-send "$1"; }
+notify() {
+    command -v notify-send &>/dev/null || return
+    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus" notify-send "$1"
+}
 
 STATE=$(gsettings get org.gnome.desktop.peripherals.touchpad send-events)
 if [ "$STATE" = "'enabled'" ]; then
