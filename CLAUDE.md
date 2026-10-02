@@ -107,3 +107,4 @@ sudo apt update && sudo apt install -y <package>
 - **fcitx5**: Dùng `fcitx5-frontend-all` (Debian). `fcitx5-gtk` và `fcitx5-qt` là package của Arch
 - **Super+Space**: Phải clear `switch-input-source` trước khi gán cho Ulauncher
 - **fcitx5 global**: Chỉ hoạt động trong text field trên GNOME Wayland — limitation đã chấp nhận
+- **AppImage**: Quản lý bằng [Gear Lever](https://github.com/mijorus/gearlever) (flatpak `it.mijorus.gearlever`, cài sau `a-flatpak.sh`). Gear Lever tự integrate AppImage vào hệ thống (di chuyển file vào thư mục quản lý, tạo `.desktop` + icon trong menu), cập nhật và gỡ sạch. Không tự viết script/`.desktop` cho AppImage, không dùng AppImageLauncher. Debian 13 có thể cần `libfuse2t64` để chạy AppImage
