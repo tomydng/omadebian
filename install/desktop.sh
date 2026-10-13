@@ -33,7 +33,6 @@ flatpak install -y flathub \
   com.bitwarden.desktop \
   com.usebruno.Bruno \
   org.gimp.GIMP \
-  com.getpostman.Postman \
   com.mongodb.Compass || true
 
 # Apps with complex installs
