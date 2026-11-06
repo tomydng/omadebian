@@ -2,6 +2,8 @@
 
 An Omarchy-inspired, native GNOME Shell 48 panel showing **remaining subscription quota** for Claude Code and Codex. Claude appears first and is the default top-bar subscription.
 
+This plugin is maintained in Omadebian at `plugins/agents/`. The desktop installer installs it automatically; its source has no separate nested Git repository. Run the commands below from this directory, or use `bash plugins/agents/install.sh` from the Omadebian root.
+
 ## Use
 
 Click the robot / `Claude · 72%` in the top bar. Each subscription shows its plan, session and weekly allowances, remaining percentage, progress bars, and reset countdown. The top bar uses the lower of the general session and weekly allowances. Model-specific windows remain separate in the panel.
