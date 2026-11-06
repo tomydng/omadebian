@@ -20,4 +20,3 @@ Native GJS extension (selected by implementer following user's “làm đi” in
 Include local source, meaningful collector/protocol tests, GNOME runtime verification, install/uninstall scripts, and a distributable extension zip. Enable it if the running session supports registering a newly installed extension. Never restart or log out the desktop automatically. If GNOME requires a new login, queue enablement and report that remaining step.
 
 Preserve attribution for reused Omarchy SVG assets under its MIT license. Multi-account administration, token charts and unrelated Omarchy creation prompts are outside this quota-focused version.
-
