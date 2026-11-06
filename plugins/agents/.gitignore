@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+dist/
+.superpowers/
+schemas/gschemas.compiled
+

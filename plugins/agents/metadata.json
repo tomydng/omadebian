@@ -1,0 +1,8 @@
+{
+  "uuid": "agents@tomydng.local",
+  "name": "Agents",
+  "description": "Claude Code and Codex remaining quota, limits, and reset times. An Omarchy-inspired native GNOME panel.",
+  "shell-version": ["48"],
+  "version": 1,
+  "settings-schema": "org.gnome.shell.extensions.agents"
+}

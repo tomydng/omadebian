@@ -1,0 +1,57 @@
+.agents-bar { spacing: 7px; }
+.agents-bar-label { font-size: 12px; font-weight: 500; }
+.agents-menu .popup-menu-content {
+  background-color: #191c24; color: #e6e7ed;
+  border: 1px solid rgba(190, 199, 220, 0.17); border-radius: 18px;
+  padding: 0;
+}
+.agents-container { padding: 24px; }
+.agents-content { width: 370px; spacing: 20px; color: #e6e7ed; }
+.agents-hero { spacing: 13px; }
+.agents-hero-icon { color: #c8cde0; }
+.agents-titles { spacing: 5px; }
+.agents-title { font-size: 25px; font-weight: 700; }
+.agents-eyebrow { font-family: monospace; font-size: 9px; font-weight: 600; letter-spacing: 1px; color: #8e95aa; }
+.agents-controls { spacing: 4px; }
+.agents-icon-button {
+  border: 1px solid rgba(160, 170, 196, 0.17); border-radius: 9px;
+  padding: 8px; color: #b7bed3; background-color: rgba(160, 170, 196, 0.04);
+}
+.agents-icon-button:hover, .agents-icon-button:focus { background-color: rgba(160, 170, 196, 0.17); color: #ffffff; }
+.agents-icon-button:active { background-color: rgba(160, 170, 196, 0.24); }
+.agents-providers { spacing: 12px; }
+.agents-provider {
+  spacing: 15px; padding: 18px;
+  background-color: rgba(160, 170, 196, 0.045);
+  border: 1px solid rgba(160, 170, 196, 0.12); border-radius: 13px;
+}
+.agents-provider-heading { spacing: 10px; }
+.agents-provider-name { font-size: 15px; font-weight: 600; }
+.agents-plan { font-family: monospace; font-size: 10px; color: #a1a9c0; padding: 3px 7px; border-radius: 5px; background-color: rgba(160, 170, 196, 0.10); }
+.agents-quota { spacing: 7px; }
+.agents-window-label { color: #b7bed3; font-size: 12px; }
+.agents-percent { font-family: monospace; font-size: 12px; font-weight: 600; color: #e6e7ed; }
+.agents-danger { color: #e9787d; }
+.agents-meter { min-height: 6px; }
+.agents-reset { font-family: monospace; font-size: 10px; color: #858ea7; }
+.agents-status { font-size: 11px; color: #b0a6a1; }
+.agents-signin { font-size: 11px; font-weight: 600; color: #de9d7e; padding: 6px 10px; border: 1px solid rgba(222, 157, 126, 0.25); border-radius: 7px; }
+.agents-signin:hover, .agents-signin:focus { background-color: rgba(222, 157, 126, 0.13); }
+.agents-separator { height: 1px; background-color: rgba(160, 170, 196, 0.14); }
+.agents-footer, .agents-accounts { spacing: 12px; }
+.agents-actions { spacing: 8px; }
+.agents-action {
+  padding: 10px 12px; border-radius: 9px; border: 1px solid rgba(160, 170, 196, 0.17);
+  color: #c5cce0; font-size: 12px; background-color: rgba(160, 170, 196, 0.04);
+}
+.agents-action:hover, .agents-action:focus { color: #ffffff; background-color: rgba(160, 170, 196, 0.16); }
+.agents-updated { font-family: monospace; font-size: 9px; color: #78829c; }
+.agents-light .popup-menu-content { background-color: #faf9f7; color: #303541; border-color: rgba(40, 45, 60, 0.16); }
+.agents-light .agents-content { color: #303541; }
+.agents-light .agents-title, .agents-light .agents-provider-name, .agents-light .agents-percent { color: #303541; }
+.agents-light .agents-eyebrow, .agents-light .agents-reset, .agents-light .agents-updated { color: #72798a; }
+.agents-light .agents-window-label, .agents-light .agents-action, .agents-light .agents-icon-button, .agents-light .agents-hero-icon { color: #555e71; }
+.agents-light .agents-plan { color: #5a6273; }
+.agents-light .agents-status { color: #84705f; }
+.agents-light .agents-signin { color: #a35e40; }
+.agents-light .agents-danger { color: #bd444b; }
