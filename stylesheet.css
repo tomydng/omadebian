@@ -6,7 +6,7 @@
   padding: 0;
 }
 .agents-container { padding: 24px; }
-.agents-content { width: 370px; spacing: 20px; }
+.agents-content { width: 370px; spacing: 20px; color: #e6e7ed; }
 .agents-hero { spacing: 13px; }
 .agents-hero-icon { color: #c8cde0; }
 .agents-titles { spacing: 5px; }
@@ -47,6 +47,7 @@
 .agents-action:hover, .agents-action:focus { color: #ffffff; background-color: rgba(160, 170, 196, 0.16); }
 .agents-updated { font-family: monospace; font-size: 9px; color: #78829c; }
 .agents-light .popup-menu-content { background-color: #faf9f7; color: #303541; border-color: rgba(40, 45, 60, 0.16); }
+.agents-light .agents-content { color: #303541; }
 .agents-light .agents-title, .agents-light .agents-provider-name, .agents-light .agents-percent { color: #303541; }
 .agents-light .agents-eyebrow, .agents-light .agents-reset, .agents-light .agents-updated { color: #72798a; }
 .agents-light .agents-window-label, .agents-light .agents-action, .agents-light .agents-icon-button, .agents-light .agents-hero-icon { color: #555e71; }

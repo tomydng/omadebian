@@ -13,10 +13,7 @@ if [[ "${1:-}" == '--pack-only' ]]; then
   exit 0
 fi
 gnome-extensions install --force "$project_dir/dist/$uuid.shell-extension.zip"
-# Some Shell versions can register it immediately; others discover it at login.
-gdbus call --session --dest org.gnome.Shell.Extensions \
-  --object-path /org/gnome/Shell/Extensions \
-  --method org.gnome.Shell.Extensions.ReloadExtension "$uuid" >/dev/null 2>&1 || true
+# Already-known extensions enable immediately; new ones are discovered at login.
 if gnome-extensions enable "$uuid" 2>/dev/null; then
   printf 'Installed and enabled Agents.\n'
 else

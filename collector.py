@@ -34,6 +34,7 @@ MESSAGES = {
 _processes: set[subprocess.Popen] = set()
 _process_lock = threading.Lock()
 _cancelled = threading.Event()
+_own_group = False
 
 
 def object_or_empty(value):
@@ -62,7 +63,10 @@ def reset_time(value):
         if isinstance(value, (int, float)) and math.isfinite(value):
             return int(value) if 0 < value < 10**11 else None
         if isinstance(value, str):
-            return int(datetime.fromisoformat(value.replace('Z', '+00:00')).replace(tzinfo=timezone.utc).timestamp())
+            parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return int(parsed.timestamp())
     except (ValueError, OverflowError, OSError):
         pass
     return None
@@ -153,7 +157,11 @@ def fetch_claude():
         return failure('claude', 'missing')
     expiry = oauth.get('expiresAt')
     if not os.environ.get('CLAUDE_CODE_OAUTH_TOKEN') and isinstance(expiry, (int, float)) and expiry < time.time()*1000:
-        return failure('claude', 'auth')
+        refresh_claude_signin()
+        oauth = object_or_empty(read_json(claude_home()/'.credentials.json').get('claudeAiOauth'))
+        token, expiry = oauth.get('accessToken'), oauth.get('expiresAt', 0)
+        if not isinstance(token, str) or not token or not isinstance(expiry, (int, float)) or expiry < time.time()*1000:
+            return failure('claude', 'auth')
     request = urllib.request.Request('https://api.anthropic.com/api/oauth/usage', headers={
         'Authorization': 'Bearer '+token, 'anthropic-beta': 'oauth-2025-04-20', 'Accept': 'application/json'})
     try:
@@ -178,16 +186,61 @@ def fetch_claude():
         return failure('claude', 'offline')
 
 
+def spawn(command, **kwargs):
+    with _process_lock:
+        if _cancelled.is_set():
+            raise OSError('Cancelled')
+        process = subprocess.Popen(command, start_new_session=not _own_group, **kwargs)
+        _processes.add(process)
+    return process
+
+
+def stop_process(process):
+    def send(signum):
+        try:
+            if _own_group:
+                process.send_signal(signum)
+            else:
+                os.killpg(process.pid, signum)
+        except ProcessLookupError:
+            pass
+    send(signal.SIGTERM)
+    try:
+        process.wait(timeout=0.5)
+    except subprocess.TimeoutExpired:
+        send(signal.SIGKILL)
+        process.wait()
+    for stream in (process.stdin, process.stdout):
+        if stream:
+            stream.close()
+    with _process_lock:
+        _processes.discard(process)
+
+
+def refresh_claude_signin():
+    executable = shutil.which('claude')
+    if not executable:
+        executable = next((str(path) for path in (Path.home()/'.local/bin/claude', Path.home()/'.local/share/mise/shims/claude') if os.access(path, os.X_OK)), None)
+    if not executable:
+        return
+    process = None
+    try:
+        # The CLI renews its own existing sign-in. This never logs in or calls a model.
+        process = spawn([executable, 'auth', 'status', '--json'], stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process.wait(timeout=8)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    finally:
+        if process:
+            stop_process(process)
+
+
 class Rpc:
     def __init__(self, command, timeout):
         self.deadline = time.monotonic()+timeout
         self.buffer = b''
-        with _process_lock:
-            if _cancelled.is_set():
-                raise OSError('Cancelled')
-            self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                            stderr=subprocess.DEVNULL, start_new_session=True)
-            _processes.add(self.process)
+        self.process = spawn(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         self.selector = selectors.DefaultSelector()
         self.selector.register(self.process.stdout, selectors.EVENT_READ)
 
@@ -224,22 +277,7 @@ class Rpc:
 
     def close(self):
         self.selector.close()
-        try:
-            os.killpg(self.process.pid, signal.SIGTERM)
-        except ProcessLookupError:
-            pass
-        try:
-            self.process.wait(timeout=1)
-        except subprocess.TimeoutExpired:
-            try:
-                os.killpg(self.process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            self.process.wait()
-        for stream in (self.process.stdin, self.process.stdout):
-            stream.close()
-        with _process_lock:
-            _processes.discard(self.process)
+        stop_process(self.process)
 
 
 def find_codex():
@@ -342,6 +380,21 @@ def public_record(record):
     return {key: value for key, value in record.items() if not key.startswith('_')}
 
 
+def collect_provider(provider, previous, fetch, now, force):
+    before = identity(provider)
+    result = cached_provider(provider, previous, before, fetch, now, force)
+    after = identity(provider)
+    if before != after:
+        # A CLI token renewal or an account switch invalidates the first reading.
+        # Retry against the new identity, never relabel old quota as its result.
+        result = cached_provider(provider, {}, after, fetch, now, True)
+        latest = identity(provider)
+        if after != latest:
+            result = failure(provider, 'auth')
+            result.update({'_identity': latest, '_attemptAt': now})
+    return result
+
+
 def collect(force=False):
     root = Path(os.environ.get('XDG_CACHE_HOME') or Path.home()/'.cache')/'gnome-agents'
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -351,30 +404,39 @@ def collect(force=False):
         cache = read_json(root/'quota.json')
         now = int(time.time())
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-            futures = [executor.submit(cached_provider, name, cache.get(name), identity(name), fetch, now, force)
+            futures = [executor.submit(collect_provider, name, cache.get(name), fetch, now, force)
                        for name, fetch in [('claude', fetch_claude), ('codex', fetch_codex)]]
             providers = [future.result() for future in futures]
-        # Codex may refresh its own credentials; bind the cache to that new login.
-        for provider in providers:
-            provider['_identity'] = identity(provider['id'])
         write_cache(root/'quota.json', {provider['id']: provider for provider in providers})
     return {'updatedAt': now, 'providers': [public_record(provider) for provider in providers]}
 
 
 def cancel(signum, frame):
     _cancelled.set()
+    if _own_group:
+        # Kill the reader AND all inherited CLI children atomically. SystemExit
+        # would wait for ThreadPoolExecutor's blocked HTTP threads at shutdown.
+        os.killpg(os.getpgrp(), signal.SIGKILL)
     # The handler must not acquire a thread lock that interrupted code could own.
     for process in tuple(_processes):
         try:
             os.killpg(process.pid, signal.SIGKILL)
         except ProcessLookupError:
             pass
-    raise SystemExit(0)
+    os._exit(124)
 
 
-if __name__ == '__main__':
+def main(timeout=35):
+    global _own_group
+    # Gio starts a normal child process; isolate its group before any threads or
+    # CLIs exist so cancellation cannot affect GNOME or unrelated processes.
+    if os.getpgrp() != os.getpid():
+        os.setsid()
+    _own_group = True
     signal.signal(signal.SIGTERM, cancel)
     signal.signal(signal.SIGINT, cancel)
+    signal.signal(signal.SIGALRM, cancel)
+    signal.setitimer(signal.ITIMER_REAL, timeout)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--force', action='store_true')
     args = parser.parse_args()
@@ -382,3 +444,9 @@ if __name__ == '__main__':
         print(json.dumps(collect(args.force), allow_nan=False))
     except Exception:
         print(json.dumps({'updatedAt': int(time.time()), 'providers': [failure(name, 'error') for name in NAMES]}))
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+
+
+if __name__ == '__main__':
+    main()

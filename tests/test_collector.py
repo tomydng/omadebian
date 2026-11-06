@@ -1,8 +1,10 @@
 import json
+import io
 import os
 import stat
 import sys
 import tempfile
+import subprocess
 import time
 import unittest
 from pathlib import Path
@@ -51,6 +53,9 @@ class QuotaTests(unittest.TestCase):
 
     def test_codex_legacy_bucket(self):
         self.assertEqual(c.codex_windows({'rateLimits': {'primary': {'usedPercent': 0, 'windowDurationMins': 60}}})[0]['remaining'], 100)
+
+    def test_reset_offset_is_respected(self):
+        self.assertEqual(c.reset_time('2030-01-01T07:00:00+07:00'), 1893456000)
 
     def test_cached_expired_windows_are_unknown(self):
         previous = {'id': 'claude', 'name': 'Claude Code', 'status': 'ok', 'plan': 'Pro', 'fetchedAt': 100,
@@ -112,6 +117,22 @@ class CacheTests(unittest.TestCase):
     def test_public_output_omits_private_cache_fields(self):
         self.assertEqual(c.public_record({'id': 'claude', '_identity': 'secret', '_attemptAt': 10}), {'id': 'claude'})
 
+    def test_account_changed_during_fetch_retries_with_new_identity(self):
+        a = c.success('claude', 'Pro', [{'remaining': 10}])
+        b = c.success('claude', 'Pro', [{'remaining': 80}])
+        with patch.object(c, 'identity', side_effect=['a', 'b', 'b']):
+            with patch.object(c, 'fetch_claude', side_effect=[a, b]) as fetch:
+                result = c.collect_provider('claude', {}, fetch, 1000, False)
+        self.assertEqual(result['_identity'], 'b')
+        self.assertEqual(result['windows'][0]['remaining'], 80)
+
+    def test_repeated_account_switch_does_not_display_either_quota(self):
+        response = c.success('claude', 'Pro', [{'remaining': 10}])
+        with patch.object(c, 'identity', side_effect=['a', 'b', 'c']):
+            result = c.collect_provider('claude', {}, lambda: response, 1000, False)
+        self.assertEqual(result['windows'], [])
+        self.assertNotEqual(result['status'], 'ok')
+
 
 class ProtocolTests(unittest.TestCase):
     def test_codex_initializes_and_reads_quota(self):
@@ -132,11 +153,88 @@ class ProtocolTests(unittest.TestCase):
             path = Path(tmp)/'.credentials.json'
             original = json.dumps({'claudeAiOauth': {'accessToken': 'do-not-print-me', 'expiresAt': 1}})
             path.write_text(original)
-            with patch.dict(os.environ, {'CLAUDE_CONFIG_DIR': tmp, 'CLAUDE_CODE_OAUTH_TOKEN': ''}):
+            with patch.dict(os.environ, {'CLAUDE_CONFIG_DIR': tmp, 'CLAUDE_CODE_OAUTH_TOKEN': ''}), patch.object(c, 'refresh_claude_signin', return_value=None):
                 result = c.fetch_claude()
             self.assertEqual(result['status'], 'auth')
             self.assertNotIn('do-not-print-me', json.dumps(result))
             self.assertEqual(path.read_text(), original)
+
+    def test_claude_cli_can_renew_expired_existing_signin(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)/'.credentials.json'
+            path.write_text(json.dumps({'claudeAiOauth': {'accessToken': 'expired', 'expiresAt': 1}}))
+            def renewed():
+                path.write_text(json.dumps({'claudeAiOauth': {'accessToken': 'renewed-secret', 'expiresAt': 10**15, 'subscriptionType': 'pro'}}))
+            response = io.BytesIO(json.dumps({'five_hour': {'utilization': 22}}).encode())
+            with patch.dict(os.environ, {'CLAUDE_CONFIG_DIR': tmp, 'CLAUDE_CODE_OAUTH_TOKEN': ''}), \
+                 patch.object(c, 'refresh_claude_signin', side_effect=renewed), \
+                 patch.object(c.urllib.request, 'build_opener') as opener:
+                opener.return_value.open.return_value = response
+                result = c.fetch_claude()
+            self.assertEqual(result['status'], 'ok')
+            self.assertEqual(result['windows'][0]['remaining'], 78)
+            self.assertNotIn('renewed-secret', json.dumps(result))
+
+    def test_overall_deadline_terminates_a_stalled_worker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            script = '''import collector as c, time
+c.identity = lambda provider: "test"
+def stalled():
+ print("ready", flush=True)
+ time.sleep(60)
+c.fetch_claude = stalled
+c.fetch_codex = lambda: c.failure("codex", "missing")
+c.main(timeout=0.2)
+'''
+            env = dict(os.environ, XDG_CACHE_HOME=tmp)
+            start = time.monotonic()
+            result = subprocess.run([sys.executable, '-c', script], env=env, capture_output=True, timeout=2)
+            self.assertLess(time.monotonic()-start, 1.5)
+            self.assertIn(b'ready', result.stdout)
+            self.assertNotEqual(result.returncode, 0)
+
+    def test_termination_does_not_wait_for_http_worker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            script = '''import collector as c, time
+c.identity = lambda provider: "test"
+def stalled():
+ print("ready", flush=True)
+ time.sleep(60)
+c.fetch_claude = stalled
+c.fetch_codex = lambda: c.failure("codex", "missing")
+c.main(timeout=2)
+'''
+            env = dict(os.environ, XDG_CACHE_HOME=tmp)
+            process = subprocess.Popen([sys.executable, '-c', script], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            try:
+                self.assertEqual(process.stdout.readline().strip(), b'ready')
+                process.terminate()
+                process.communicate(timeout=1)
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                process.communicate()
+
+    def test_deadline_kills_cli_child_with_reader(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            child_file = Path(tmp)/'child.pid'
+            child_code = 'import os,time;open('+repr(str(child_file))+',"w").write(str(os.getpid()));time.sleep(60)'
+            script = '''import collector as c, sys
+c.identity = lambda provider: "test"
+c.fetch_claude = lambda: c.failure("claude", "missing")
+real_fetch = c.fetch_codex
+c.fetch_codex = lambda: real_fetch([sys.executable, "-c", '''+repr(child_code)+'''])
+c.main(timeout=0.3)
+'''
+            result = subprocess.run([sys.executable, '-c', script], env=dict(os.environ, XDG_CACHE_HOME=tmp), capture_output=True, timeout=2)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertTrue(child_file.exists(), 'CLI child must actually start')
+            pid = int(child_file.read_text())
+            try:
+                state = Path(f'/proc/{pid}/stat').read_text().split(') ', 1)[1].split()[0]
+                self.assertEqual(state, 'Z', 'CLI child must not remain running')
+            except FileNotFoundError:
+                pass
 
 
 if __name__ == '__main__':

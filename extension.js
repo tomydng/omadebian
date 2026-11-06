@@ -9,7 +9,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Util from 'resource:///org/gnome/shell/misc/util.js';
-import {ageLabel, panelLabel, percentText, primaryQuota, remainingValue, resetLabel} from './quota.js';
+import {ageLabel, markStale, panelLabel, percentText, primaryQuota, remainingValue, resetLabel} from './quota.js';
 
 const COLORS = {claude: [0.85, 0.56, 0.43], codex: [0.54, 0.77, 0.76], warning: [0.91, 0.71, 0.42], danger: [0.91, 0.47, 0.49]};
 
@@ -40,6 +40,7 @@ export default class AgentsExtension extends Extension {
         this._rows = [];
         this._data = {providers: []};
         this._lastStarted = 0;
+        this._readerError = '';
         this._proc = null;
         this._indicator = new PanelMenu.Button(0.0, 'Agents — remaining quota');
         const bar = box('agents-bar');
@@ -142,7 +143,7 @@ export default class AgentsExtension extends Extension {
         const actions = box('agents-actions');
         for (const [id, text] of [['claude', 'Claude Code'], ['codex', 'Codex']])
             actions.add_child(this._textButton(text, () => this._launch(id)));
-        actions.add_child(this._button('emblem-system-symbolic', 'Agents preferences', () => {
+        actions.add_child(this._button('preferences-system-symbolic', 'Agents preferences', () => {
             this._indicator.menu.close();
             this.openPreferences();
         }));
@@ -176,7 +177,8 @@ export default class AgentsExtension extends Extension {
             const heading = box('agents-provider-heading');
             heading.add_child(new St.Icon({gicon: this._icon(id === 'codex' && this._light ? 'codex-light.svg' : `${id}.svg`), icon_size: 25}));
             heading.add_child(label(provider.name, 'agents-provider-name', true));
-            heading.add_child(label(provider.plan || '', 'agents-plan'));
+            if (provider.plan)
+                heading.add_child(label(provider.plan, 'agents-plan'));
             section.add_child(heading);
 
             if (provider.windows.length) {
@@ -197,7 +199,7 @@ export default class AgentsExtension extends Extension {
                 }
             }
             if (provider.status !== 'ok' && provider.status !== 'loading') {
-                const status = label(provider.stale ? `Last known quota · ${provider.message}` : provider.message, 'agents-status');
+                const status = label(provider.stale ? `Last known quota · ${ageLabel(provider.fetchedAt)}\n${provider.message}` : provider.message, 'agents-status');
                 status.clutter_text.line_wrap = true;
                 status.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
                 section.add_child(status);
@@ -248,7 +250,9 @@ export default class AgentsExtension extends Extension {
             row.meter.queue_repaint();
         }
         if (!this._proc && this._data.updatedAt)
-            this._updated.text = `${ageLabel(this._data.updatedAt)} · auto refresh`;
+            this._updated.text = this._readerError || `${ageLabel(this._data.updatedAt)} · auto refresh`;
+        else if (!this._proc && this._readerError)
+            this._updated.text = this._readerError;
     }
 
     _scheduleRefresh() {
@@ -256,7 +260,7 @@ export default class AgentsExtension extends Extension {
             GLib.source_remove(this._refreshTimer);
         this._refreshTimer = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
             this._settings.get_int('refresh-interval'), () => {
-                this._refresh(false);
+                this._refresh(true);
                 return GLib.SOURCE_CONTINUE;
             });
     }
@@ -274,8 +278,8 @@ export default class AgentsExtension extends Extension {
         try {
             process = Gio.Subprocess.new(argv, Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE);
         } catch (_error) {
-            this._updated.text = 'Could not start quota reader';
             this._refreshButton.reactive = true;
+            this._failReader('Could not start quota reader · try again');
             return;
         }
         this._proc = process;
@@ -300,14 +304,22 @@ export default class AgentsExtension extends Extension {
                 if (!process.get_successful() || output.length > 1048576)
                     throw new Error('Reader did not succeed');
                 const data = JSON.parse(output);
-                if (!Array.isArray(data.providers))
+                if (!Array.isArray(data.providers) || !data.providers.every(provider =>
+                    ['claude', 'codex'].includes(provider.id) && Array.isArray(provider.windows)))
                     throw new Error('Invalid quota data');
+                this._readerError = '';
                 this._data = data;
                 this._render();
             } catch (_error) {
-                this._updated.text = 'Could not refresh · try again';
+                this._failReader('Could not refresh · try again');
             }
         });
+    }
+
+    _failReader(message) {
+        this._readerError = message;
+        this._data = markStale(this._data, message);
+        this._render();
     }
 
     _launch(provider, signin = false) {

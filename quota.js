@@ -16,6 +16,8 @@ export function percentText(value) {
 export function primaryQuota(provider, now = Date.now() / 1000) {
     const all = Array.isArray(provider?.windows) ? provider.windows : [];
     const general = all.filter(window => ['Session', 'Weekly'].includes(window.label));
+    if (general.some(window => remainingValue(window, now) === null))
+        return null;
     const windows = (general.length ? general : all)
         .map(window => ({...window, remaining: remainingValue(window, now)}))
         .filter(window => window.remaining !== null);
@@ -54,4 +56,10 @@ export function ageLabel(timestamp, now = Date.now() / 1000) {
     if (!minutes)
         return 'Updated just now';
     return minutes < 60 ? `Updated ${minutes}m ago` : `Updated ${Math.floor(minutes / 60)}h ago`;
+}
+
+export function markStale(data, message) {
+    return {...data, providers: (data.providers ?? []).map(provider => ({
+        ...provider, stale: Boolean(provider.windows?.length), status: 'stale', message,
+    }))};
 }

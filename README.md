@@ -30,7 +30,7 @@ On Wayland, a newly installed extension may require **one logout/login**. The in
 
 ## Data
 
-Claude uses its existing OAuth sign-in in `${CLAUDE_CONFIG_DIR:-~/.claude}/.credentials.json` (or `CLAUDE_CODE_OAUTH_TOKEN`) and `https://api.anthropic.com/api/oauth/usage`, like Omarchy. An expired token needs Claude Code to renew it, or a normal `claude auth login`. The extension never rotates Claude credentials itself.
+Claude uses its existing OAuth sign-in in `${CLAUDE_CONFIG_DIR:-~/.claude}/.credentials.json` (or `CLAUDE_CODE_OAUTH_TOKEN`) and `https://api.anthropic.com/api/oauth/usage`, like Omarchy. When an existing token expires, a bounded `claude auth status --json` lets the CLI renew its own credentials. If renewal fails, use normal `claude auth login`. The extension never edits Claude credentials itself.
 
 Codex uses `codex app-server`, the initialize handshake, `account/read`, and `account/rateLimits/read`. The CLI manages its own authentication. API-key-only accounts have no subscription quota to display. Quota collection does not create a thread or call a model.
 

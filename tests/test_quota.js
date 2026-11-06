@@ -1,4 +1,4 @@
-import {remainingValue, percentText, primaryQuota, resetLabel, panelLabel} from '../quota.js';
+import {remainingValue, percentText, primaryQuota, resetLabel, panelLabel, markStale} from '../quota.js';
 
 let count = 0;
 function equal(actual, expected, name) {
@@ -19,6 +19,7 @@ const claude = {id: 'claude', status: 'ok', windows: [
     {label: 'Weekly', remaining: 20, resetsAt: 9000},
 ]};
 equal(primaryQuota(claude, 100).remaining, 20, 'show restrictive window');
+equal(primaryQuota({...claude, windows: [{label: 'Session', remaining: 100}, {label: 'Weekly', remaining: 50, resetsAt: 90}]}, 100), null, 'expired overall window cannot imply full quota');
 equal(primaryQuota({...claude, windows: [...claude.windows, {label: 'Opus · Weekly', remaining: 1}]}, 100).remaining, 20, 'model quota does not replace overall quota');
 equal(panelLabel(claude, true, 100), 'Claude · 20%', 'Claude bar label');
 equal(panelLabel({...claude, stale: true}, true, 100), 'Claude · ~20%', 'last known is marked');
@@ -29,4 +30,11 @@ equal(resetLabel(null, 200), 'Reset time unavailable', 'missing reset');
 equal(resetLabel(200+3660, 200), 'Resets in 1h 1m', 'hours and minutes');
 equal(resetLabel(200+86400*3+7200, 200), 'Resets in 3d 2h', 'days');
 equal(resetLabel(230, 200), 'Resets in <1m', 'sub-minute');
+const fresh = {updatedAt: 100, providers: [claude]};
+const failed = markStale(fresh, 'Could not refresh');
+equal(failed.providers[0].stale, true, 'reader failure marks data stale');
+equal(failed.providers[0].status, 'stale', 'reader failure status');
+equal(failed.providers[0].message, 'Could not refresh', 'persistent actionable error');
+equal(panelLabel(failed.providers[0], true, 100), 'Claude · ~20%', 'reader failure cannot show fresh quota');
+equal(fresh.providers[0].status, 'ok', 'original data is not mutated');
 print(`${count} quota UI assertions passed`);
