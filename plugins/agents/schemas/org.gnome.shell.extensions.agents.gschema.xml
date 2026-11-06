@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.agents" path="/org/gnome/shell/extensions/agents/">
+    <key name="show-percentage" type="b">
+      <default>true</default>
+      <summary>Show remaining quota on the top bar</summary>
+    </key>
+    <key name="primary-provider" type="s">
+      <choices><choice value="claude"/><choice value="codex"/></choices>
+      <default>'claude'</default>
+      <summary>Provider shown on the top bar</summary>
+    </key>
+    <key name="refresh-interval" type="i">
+      <range min="60" max="3600"/>
+      <default>300</default>
+      <summary>Refresh interval in seconds</summary>
+    </key>
+  </schema>
+</schemalist>

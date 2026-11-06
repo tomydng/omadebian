@@ -1,6 +1,8 @@
 #!/bin/bash
 
-sudo apt install -y gnome-shell-extension-manager gir1.2-gtop-2.0 gir1.2-clutter-1.0
+OMADEBIAN_PATH="${OMADEBIAN_PATH:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)}"
+
+sudo apt install -y gnome-shell-extension-manager gir1.2-gtop-2.0 gir1.2-clutter-1.0 python3-gi libglib2.0-bin
 pipx install gnome-extensions-cli --system-site-packages
 
 # Install new extensions
@@ -78,3 +80,6 @@ gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-posi
 gsettings set org.gnome.shell.extensions.clipboard-indicator history-size 15
 gsettings set org.gnome.shell.keybindings toggle-message-tray "@as []"
 gsettings set org.gnome.shell.extensions.clipboard-indicator toggle-menu "['<Super>v']"
+
+# Install bundled GNOME plugins.
+bash "$OMADEBIAN_PATH/plugins/agents/install.sh"
