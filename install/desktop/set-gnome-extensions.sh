@@ -15,6 +15,7 @@ gext install tophat@fflewddur.github.io
 gext install AlphabeticalAppGrid@stuarthayhurst
 gext install clipboard-indicator@tudmotu.com
 gext install appindicatorsupport@rgcjonas.gmail.com
+gext install top-bar-organizer-plus@shibasishpaul.github.com
 
 # Compile gsettings schemas in order to be able to set them
 sudo cp ~/.local/share/gnome-shell/extensions/tactile@lundal.io/schemas/org.gnome.shell.extensions.tactile.gschema.xml /usr/share/glib-2.0/schemas/
@@ -25,6 +26,7 @@ sudo cp ~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/schemas
 sudo cp ~/.local/share/gnome-shell/extensions/AlphabeticalAppGrid\@stuarthayhurst/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/clipboard-indicator\@tudmotu.com/schemas/org.gnome.shell.extensions.clipboard-indicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/appindicatorsupport\@rgcjonas.gmail.com/schemas/org.gnome.shell.extensions.appindicator.gschema.xml /usr/share/glib-2.0/schemas/
+sudo cp ~/.local/share/gnome-shell/extensions/top-bar-organizer-plus\@shibasishpaul.github.com/schemas/org.gnome.shell.extensions.top-bar-organizer-plus.gschema.xml /usr/share/glib-2.0/schemas/
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Configure Tactile
@@ -37,6 +39,8 @@ gsettings set org.gnome.shell.extensions.tactile row-1 1
 gsettings set org.gnome.shell.extensions.tactile gap-size 10
 
 # Configure Just Perfection
+gsettings set org.gnome.shell.extensions.just-perfection panel-button-padding-size 5
+gsettings set org.gnome.shell.extensions.just-perfection panel-indicator-padding-size 5
 gsettings set org.gnome.shell.extensions.just-perfection animation 2
 gsettings set org.gnome.shell.extensions.just-perfection dash-app-running true
 gsettings set org.gnome.shell.extensions.just-perfection workspace true
@@ -73,6 +77,12 @@ gsettings set org.gnome.shell.extensions.tophat mem-abs-units true
 gsettings set org.gnome.shell.extensions.tophat mem-display numeric
 gsettings set org.gnome.shell.extensions.tophat cpu-display numeric
 
+# Configure Top Bar Organizer Plus (panel item order)
+gsettings set org.gnome.shell.extensions.top-bar-organizer-plus left-box-order "['activities', 'Space Bar']"
+gsettings set org.gnome.shell.extensions.top-bar-organizer-plus center-box-order "['dateMenu']"
+gsettings set org.gnome.shell.extensions.top-bar-organizer-plus right-box-order "['agents@tomydng.local', 'screenRecording', 'screenSharing', 'dwellClick', 'TopHat', 'keyboard', 'clipboardIndicator', 'a11y', 'kimpanel', 'quickSettings']"
+gsettings set org.gnome.shell.extensions.top-bar-organizer-plus appindicator-order-mode 'safe'
+
 # Configure AlphabeticalAppGrid
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position 'end'
 
@@ -80,6 +90,10 @@ gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-posi
 gsettings set org.gnome.shell.extensions.clipboard-indicator history-size 15
 gsettings set org.gnome.shell.keybindings toggle-message-tray "@as []"
 gsettings set org.gnome.shell.extensions.clipboard-indicator toggle-menu "['<Super>v']"
+
+# Patch kimpanel's top-bar indicator into an EVKey-style badge
+# (fixed-size V/E tile; must be re-applied if the extension is updated).
+bash "$OMADEBIAN_PATH/scripts/patch-kimpanel.sh"
 
 # Install bundled GNOME plugins.
 bash "$OMADEBIAN_PATH/plugins/agents/install.sh"
