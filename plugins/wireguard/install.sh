@@ -25,12 +25,17 @@ fi
 if [[ -n "$SUDO" ]]; then
   "$SUDO" cp "$project_dir/polkit/50-omadebian-wireguard.rules" \
     /etc/polkit-1/rules.d/
+  "$SUDO" cp "$project_dir/networkmanager/99-wireguard-unmanaged.conf" \
+    /etc/NetworkManager/conf.d/
   "$SUDO" chmod 755 /etc/wireguard
-  printf 'Polkit rule installed; /etc/wireguard is now listable.\n'
+  "$SUDO" nmcli general reload 2>/dev/null || true
+  printf 'Polkit + NetworkManager rules installed; /etc/wireguard listable.\n'
 else
   printf 'NOTE: run this once manually:\n'
   printf '  sudo cp %s/polkit/50-omadebian-wireguard.rules /etc/polkit-1/rules.d/\n' "$project_dir"
+  printf '  sudo cp %s/networkmanager/99-wireguard-unmanaged.conf /etc/NetworkManager/conf.d/\n' "$project_dir"
   printf '  sudo chmod 755 /etc/wireguard\n'
+  printf '  sudo nmcli general reload\n'
 fi
 
 if gnome-extensions enable "$uuid" 2>/dev/null; then
