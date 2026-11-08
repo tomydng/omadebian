@@ -20,16 +20,15 @@ export default class PlanifyLauncherExtension extends Extension {
             style_class: 'system-status-icon',
         }));
         this._indicator.add_child(box);
-        this._indicator.connect('button-press-event', () => {
+        this._indicator.connect('button-press-event', (actor, event) => {
             // Ignore phantom clicks: while another panel menu holds the
             // pointer grab, its release can be misrouted to arbitrary panel
-            // buttons. Only act when the pointer is really over this icon.
-            const [px, py] = global.get_pointer();
-            const [ok, sx, sy] = this._indicator.get_transformed_position();
-            const w = this._indicator.allocation.x2 - this._indicator.allocation.x1;
-            const h = this._indicator.allocation.y2 - this._indicator.allocation.y1;
-            if (!ok || px < sx || px > sx + w || py < sy || py > sy + h) {
-                log(`planify-launcher: ignored phantom click at ${px},${py} (icon at ${sx},${sy} ${w}x${h})`);
+            // buttons. The event carries actor-relative coordinates, so a
+            // misrouted press (pointer far away) falls outside the bounds.
+            const [ex, ey] = event.get_coords();
+            const {x1, y1, x2, y2} = actor.allocation;
+            if (ex < x1 || ex > x2 || ey < y1 || ey > y2) {
+                log(`planify-launcher: ignored phantom click at ${ex},${ey} (bounds ${x1},${y1}-${x2},${y2})`);
                 return true;
             }
             log('planify-launcher: BUTTON clicked');
