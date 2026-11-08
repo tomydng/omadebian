@@ -32,6 +32,17 @@ export default class PlanifyLauncherExtension extends Extension {
                 Main.panel.menuManager._closeMenu(true, Main.panel.menuManager.activeMenu);
                 return true;
             }
+            // The shell's hover tracking can desync after a panel menu
+            // grab: it then believes the pointer is over this icon while
+            // the real pointer is elsewhere, and delivers the click with
+            // "believed" coordinates. Compare the event position with the
+            // real hardware pointer; a large gap means phantom click.
+            const [ex, ey] = event.get_coords();
+            const [px, py] = global.get_pointer();
+            if (Math.abs(ex - px) > 30 || Math.abs(ey - py) > 30) {
+                log(`planify-launcher: ignored desynced click, event at ${ex},${ey} but pointer at ${px},${py}`);
+                return true;
+            }
             log('planify-launcher: BUTTON clicked');
             this._present();
             return true;
