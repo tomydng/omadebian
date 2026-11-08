@@ -14,6 +14,7 @@ if [ ! -d "$ANKI_HOME" ]; then
 fi
 
 current="$(basename "$(readlink -f "$ANKI_HOME/current" 2>/dev/null || true)")"
+echo "🔄 Anki: checking latest version (current: ${current:-unknown})..."
 release_json="$(curl -fsSL "$API_URL")" || {
     echo "⚠️  Anki: cannot reach GitHub, skipping..."
     exit 0
