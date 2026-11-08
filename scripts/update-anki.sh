@@ -8,9 +8,22 @@ set -euo pipefail
 ANKI_HOME="$HOME/.local/opt/anki"
 API_URL="https://api.github.com/repos/ankitects/anki/releases/latest"
 
-if [ ! -d "$ANKI_HOME" ]; then
+if [ -d "$ANKI_HOME" ]; then
+    :
+elif [ -e /usr/local/bin/anki ]; then
+    echo "⚠️  Anki: found a foreign install at /usr/local (not managed here)."
+    echo "    Remove it (sudo rm /usr/local/bin/anki; sudo rm -rf /usr/local/share/anki)"
+    echo "    and make sure launchers point at ~/.local/bin/anki."
+    exit 0
+else
     echo "⚠️  Anki install not found at $ANKI_HOME, skipping..."
     exit 0
+fi
+foreign="$(readlink -f /usr/local/bin/anki 2>/dev/null || true)"
+managed="$(readlink -f "$HOME/.local/bin/anki" 2>/dev/null || true)"
+if [ -n "$foreign" ] && [ "$foreign" != "$managed" ]; then
+    echo "⚠️  Anki: stale copy also installed at /usr/local — remove it to avoid update nags:"
+    echo "    sudo rm /usr/local/bin/anki && sudo rm -rf /usr/local/share/anki"
 fi
 
 current="$(basename "$(readlink -f "$ANKI_HOME/current" 2>/dev/null || true)")"
