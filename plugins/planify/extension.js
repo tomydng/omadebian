@@ -44,12 +44,8 @@ export default class PlanifyLauncherExtension extends Extension {
             // misroute, regardless of what the shell believes.
             const [ex, ey] = event.get_coords();
             const panelBottom = Main.panel.y + Main.panel.height;
-            log(`planify-launcher: BUTTON click at (${ex},${ey}), panel bottom=${panelBottom}`);
-            if (ey > panelBottom) {
-                log('planify-launcher: ignored click below the panel');
+            if (ey > panelBottom)
                 return true;
-            }
-            log('planify-launcher: BUTTON accepted');
             this._present();
             return true;
         });
@@ -60,10 +56,7 @@ export default class PlanifyLauncherExtension extends Extension {
         Main.wm.addKeybinding('toggle-binding', this._settings,
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            () => {
-                log('planify-launcher: KEYBINDING fired');
-                this._present();
-            });
+            () => this._present());
     }
 
     disable() {
