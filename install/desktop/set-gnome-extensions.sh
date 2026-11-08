@@ -100,3 +100,4 @@ bash "$OMADEBIAN_PATH/scripts/patch-kimpanel.sh"
 # Install bundled GNOME plugins.
 bash "$OMADEBIAN_PATH/plugins/agents/install.sh"
 bash "$OMADEBIAN_PATH/plugins/planify/install.sh"
+bash "$OMADEBIAN_PATH/plugins/wireguard/install.sh"

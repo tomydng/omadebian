@@ -1,0 +1,13 @@
+polkit.addRule(function(action, subject) {
+    if (action.id !== 'org.freedesktop.policykit.exec' ||
+        !subject.local || !subject.active)
+        return polkit.Result.NOT_HANDLED;
+
+    const program = action.lookup('program');
+    if (program === '/usr/bin/wg-quick' ||
+        program === '/usr/bin/ls' || program === '/bin/ls') {
+        if (subject.isInGroup('sudo'))
+            return polkit.Result.AUTH_KEEP;
+    }
+    return polkit.Result.NOT_HANDLED;
+});
