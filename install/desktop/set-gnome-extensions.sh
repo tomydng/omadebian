@@ -85,11 +85,12 @@ gsettings set org.gnome.shell.extensions.top-bar-organizer-plus center-box-order
 gsettings set org.gnome.shell.extensions.top-bar-organizer-plus right-box-order "['agents@tomydng.local', 'screenRecording', 'screenSharing', 'dwellClick', 'TopHat', 'keyboard', 'clipboardIndicator', 'a11y', 'kimpanel', 'quickSettings']"
 gsettings set org.gnome.shell.extensions.top-bar-organizer-plus appindicator-order-mode 'safe'
 
-# Configure Icon Launcher (Planify shortcut on the top bar, left side)
+# Configure Icon Launcher (Planify shortcut on the top bar, right side)
 gsettings set org.gnome.shell.extensions.icon-launcher custom-command 'flatpak run io.github.alainm23.planify'
-gsettings set org.gnome.shell.extensions.icon-launcher custom-icon-path 'io.github.alainm23.planify'
-gsettings set org.gnome.shell.extensions.icon-launcher panel-position 'left'
-gsettings set org.gnome.shell.extensions.icon-launcher icon-size 20
+gsettings set org.gnome.shell.extensions.icon-launcher custom-icon-path 'task-due-symbolic'
+gsettings set org.gnome.shell.extensions.icon-launcher panel-position 'right'
+gsettings set org.gnome.shell.extensions.icon-launcher location 9
+gsettings set org.gnome.shell.extensions.icon-launcher icon-size 16
 
 # Configure AlphabeticalAppGrid
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position 'end'
