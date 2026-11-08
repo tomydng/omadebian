@@ -1,0 +1,3 @@
+
+# Build artifacts — install.sh always repacks these locally
+plugins/*/dist/
