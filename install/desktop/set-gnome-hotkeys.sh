@@ -120,6 +120,10 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom11/ binding '<Shift><Super>s'
 
 # custom12: Planify (notes & tasks) — Super+N
+# Super+N is GNOME's focus-active-notification and Space Bar's
+# activate-empty-key by default; free it first or the shell binding wins.
+gsettings set org.gnome.shell.keybindings focus-active-notification "@as []"
+gsettings set org.gnome.shell.extensions.space-bar.shortcuts activate-empty-key "@as []"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom12/ name 'Planify - Notes & Tasks'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom12/ command 'flatpak run io.github.alainm23.planify'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom12/ binding '<Super>n'
