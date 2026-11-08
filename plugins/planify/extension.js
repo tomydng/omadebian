@@ -1,4 +1,5 @@
 import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
@@ -21,14 +22,14 @@ export default class PlanifyLauncherExtension extends Extension {
         }));
         this._indicator.add_child(box);
         this._indicator.connect('button-press-event', (actor, event) => {
-            // Ignore phantom clicks: while another panel menu holds the
-            // pointer grab, its release can be misrouted to arbitrary panel
-            // buttons. The event carries actor-relative coordinates, so a
-            // misrouted press (pointer far away) falls outside the bounds.
-            const [ex, ey] = event.get_coords();
-            const {x1, y1, x2, y2} = actor.allocation;
-            if (ex < x1 || ex > x2 || ey < y1 || ey > y2) {
-                log(`planify-launcher: ignored phantom click at ${ex},${ey} (bounds ${x1},${y1}-${x2},${y2})`);
+            if (event.get_button() !== Clutter.BUTTON_PRIMARY)
+                return false;
+            // Pattern borrowed from the AppIndicator extension: when
+            // another panel menu holds the grab (e.g. the agents usage
+            // popup), a click can be misrouted here. Only close that menu
+            // and ignore the activation.
+            if (Main.panel.menuManager.activeMenu) {
+                Main.panel.menuManager._closeMenu(true, Main.panel.menuManager.activeMenu);
                 return true;
             }
             log('planify-launcher: BUTTON clicked');
