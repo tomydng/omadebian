@@ -89,7 +89,7 @@ gsettings set org.gnome.shell.extensions.top-bar-organizer-plus appindicator-ord
 gsettings set org.gnome.shell.extensions.icon-launcher custom-command 'flatpak run io.github.alainm23.planify'
 gsettings set org.gnome.shell.extensions.icon-launcher custom-icon-path 'task-due-symbolic'
 gsettings set org.gnome.shell.extensions.icon-launcher panel-position 'right'
-gsettings set org.gnome.shell.extensions.icon-launcher location 9
+gsettings set org.gnome.shell.extensions.icon-launcher location 99
 gsettings set org.gnome.shell.extensions.icon-launcher icon-size 16
 
 # Configure AlphabeticalAppGrid
