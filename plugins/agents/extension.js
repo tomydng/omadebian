@@ -44,7 +44,7 @@ export default class AgentsExtension extends Extension {
         this._proc = null;
         this._indicator = new PanelMenu.Button(0.0, 'Agents — remaining quota');
         const bar = box('agents-bar');
-        bar.add_child(new St.Icon({gicon: this._icon('agents-symbolic.svg'), style_class: 'system-status-icon'}));
+        bar.add_child(new St.Icon({gicon: this._icon('agents-symbolic.svg'), style_class: 'system-status-icon', icon_size: 20}));
         this._barLabel = label('Claude · —', 'agents-bar-label');
         bar.add_child(this._barLabel);
         this._indicator.add_child(bar);
