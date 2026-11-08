@@ -20,7 +20,8 @@ export default class WireGuardExtension extends Extension {
         this._items = new Map();
         this._inflight = new Set();
 
-        this._indicator = new PanelMenu.Button(0.0, 'WireGuard');
+        // 0.5 centers the popup menu under the icon.
+        this._indicator = new PanelMenu.Button(0.5, 'WireGuard');
         const box = new St.BoxLayout({style_class: 'panel-status-menu-box'});
         this._icon = new St.Icon({
             gicon: Gio.icon_new_for_string(`${this.path}/icons/wireguard.svg`),
