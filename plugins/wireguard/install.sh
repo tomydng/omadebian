@@ -12,7 +12,7 @@ fi
 gnome-extensions install --force "$project_dir/dist/$uuid.shell-extension.zip"
 
 # polkit rule: remember the wg-quick authorization during the session
-# (one password prompt on the first toggle). Also make /etc/wireguard
+# (the polkit dialog froze the session). Also make /etc/wireguard
 # listable so reading profile names needs no privileges at all; the
 # .conf files themselves stay root-only (mode 600).
 if sudo -n true 2>/dev/null; then

@@ -3,11 +3,14 @@ polkit.addRule(function(action, subject) {
         !subject.local || !subject.active)
         return polkit.Result.NOT_HANDLED;
 
-    // Remember the authorization for wg-quick during the session: the
-    // password is asked on the first toggle, then never again until logout.
+    // Allow local active sudo-group users to run wg-quick without a
+    // password prompt. The polkit password dialog proved to hard-freeze
+    // this heavily extended GNOME Shell session (it is rendered by the
+    // shell itself), so no dialog may ever be triggered from the toggle.
+    // Tunnel management stays restricted to local, active, sudo users.
     if (action.lookup('program') === '/usr/bin/wg-quick' &&
         subject.isInGroup('sudo'))
-        return polkit.Result.AUTH_KEEP;
+        return polkit.Result.YES;
 
     return polkit.Result.NOT_HANDLED;
 });
