@@ -7,6 +7,13 @@ glib-compile-schemas --strict "$project_dir/schemas"
 gnome-extensions pack --force --out-dir="$project_dir/dist" \
   --extra-source=icons \
   --schema=schemas/org.gnome.shell.extensions.planify.gschema.xml "$project_dir"
+
+# Expose the schema to the user schema source as well, so gsettings CLI
+# and external tools (e.g. the shortcuts reference app) can read it.
+mkdir -p "$HOME/.local/share/glib-2.0/schemas"
+cp "$project_dir/schemas/org.gnome.shell.extensions.planify.gschema.xml" \
+  "$HOME/.local/share/glib-2.0/schemas/"
+glib-compile-schemas "$HOME/.local/share/glib-2.0/schemas"
 if [[ "${1:-}" == '--pack-only' ]]; then
   printf 'Built: %s/dist/%s.shell-extension.zip\n' "$project_dir" "$uuid"
   exit 0
