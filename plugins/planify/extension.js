@@ -37,11 +37,16 @@ export default class PlanifyLauncherExtension extends Extension {
             // the real pointer is elsewhere, and delivers the click with
             // "believed" coordinates. Compare the event position with the
             // real hardware pointer; a large gap means phantom click.
+            // The panel menu grab can misroute clicks that land inside a
+            // popup (far below the top bar) to arbitrary panel buttons.
+            // Geometry makes this trivial to reject: this icon only ever
+            // lives inside the panel, so any click below the panel is a
+            // misroute, regardless of what the shell believes.
             const [ex, ey] = event.get_coords();
-            const [px, py] = global.get_pointer();
-            log(`planify-launcher: BUTTON click event=(${ex},${ey}) pointer=(${px},${py})`);
-            if (Math.abs(ex - px) > 30 || Math.abs(ey - py) > 30) {
-                log(`planify-launcher: ignored desynced click`);
+            const panelBottom = Main.panel.y + Main.panel.height;
+            log(`planify-launcher: BUTTON click at (${ex},${ey}), panel bottom=${panelBottom}`);
+            if (ey > panelBottom) {
+                log('planify-launcher: ignored click below the panel');
                 return true;
             }
             log('planify-launcher: BUTTON accepted');
