@@ -16,7 +16,6 @@ gext install AlphabeticalAppGrid@stuarthayhurst
 gext install clipboard-indicator@tudmotu.com
 gext install appindicatorsupport@rgcjonas.gmail.com
 gext install top-bar-organizer-plus@shibasishpaul.github.com
-gext install icon-launcher@omakasui.org
 
 # Compile gsettings schemas in order to be able to set them
 sudo cp ~/.local/share/gnome-shell/extensions/tactile@lundal.io/schemas/org.gnome.shell.extensions.tactile.gschema.xml /usr/share/glib-2.0/schemas/
@@ -28,7 +27,6 @@ sudo cp ~/.local/share/gnome-shell/extensions/AlphabeticalAppGrid\@stuarthayhurs
 sudo cp ~/.local/share/gnome-shell/extensions/clipboard-indicator\@tudmotu.com/schemas/org.gnome.shell.extensions.clipboard-indicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/appindicatorsupport\@rgcjonas.gmail.com/schemas/org.gnome.shell.extensions.appindicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/top-bar-organizer-plus\@shibasishpaul.github.com/schemas/org.gnome.shell.extensions.top-bar-organizer-plus.gschema.xml /usr/share/glib-2.0/schemas/
-sudo cp ~/.local/share/gnome-shell/extensions/icon-launcher\@omakasui.org/schemas/org.gnome.shell.extensions.icon-launcher.gschema.xml /usr/share/glib-2.0/schemas/
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Configure Tactile
@@ -85,13 +83,6 @@ gsettings set org.gnome.shell.extensions.top-bar-organizer-plus center-box-order
 gsettings set org.gnome.shell.extensions.top-bar-organizer-plus right-box-order "['agents@tomydng.local', 'screenRecording', 'screenSharing', 'dwellClick', 'TopHat', 'keyboard', 'clipboardIndicator', 'a11y', 'kimpanel', 'quickSettings']"
 gsettings set org.gnome.shell.extensions.top-bar-organizer-plus appindicator-order-mode 'safe'
 
-# Configure Icon Launcher (Planify shortcut on the top bar, right side)
-gsettings set org.gnome.shell.extensions.icon-launcher custom-command 'flatpak run io.github.alainm23.planify'
-gsettings set org.gnome.shell.extensions.icon-launcher custom-icon-path 'task-due-symbolic'
-gsettings set org.gnome.shell.extensions.icon-launcher panel-position 'right'
-gsettings set org.gnome.shell.extensions.icon-launcher location 99
-gsettings set org.gnome.shell.extensions.icon-launcher icon-size 16
-
 # Configure AlphabeticalAppGrid
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position 'end'
 
@@ -106,3 +97,4 @@ bash "$OMADEBIAN_PATH/scripts/patch-kimpanel.sh"
 
 # Install bundled GNOME plugins.
 bash "$OMADEBIAN_PATH/plugins/agents/install.sh"
+bash "$OMADEBIAN_PATH/plugins/planify/install.sh"

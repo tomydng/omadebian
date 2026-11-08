@@ -1,0 +1,7 @@
+{
+  "uuid": "planify@tomydng.local",
+  "name": "Planify Launcher",
+  "description": "Planify (notes & tasks) launcher button for the GNOME top bar, next to the tray icons.",
+  "shell-version": ["48"],
+  "version": 1
+}
