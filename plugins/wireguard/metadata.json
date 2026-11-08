@@ -3,5 +3,5 @@
   "name": "WireGuard Toggle",
   "description": "WireGuard profiles in the top bar with on/off switches. Uses pkexec for wg-quick, so the polkit agent asks for the root password when needed.",
   "shell-version": ["48"],
-  "version": 3
+  "version": 4
 }

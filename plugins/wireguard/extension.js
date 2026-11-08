@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -11,8 +12,13 @@ const WG_DIR = '/etc/wireguard';
 
 export default class WireGuardExtension extends Extension {
     enable() {
+        // name -> {item, id} where id is the 'toggled' handler. All
+        // programmatic setToggleState calls MUST go through _setSwitch,
+        // which blocks the handler: PopupSwitchMenuItem re-emits
+        // 'toggled' on state changes, and acting on that emission caused
+        // an infinite spawn loop (a fork bomb of pkexec processes).
         this._items = new Map();
-        this._syncing = false;
+        this._inflight = new Set();
 
         this._indicator = new PanelMenu.Button(0.0, 'WireGuard');
         const box = new St.BoxLayout({style_class: 'panel-status-menu-box'});
@@ -20,8 +26,8 @@ export default class WireGuardExtension extends Extension {
             gicon: Gio.icon_new_for_string(`${this.path}/icons/wireguard.svg`),
             style_class: 'system-status-icon',
         });
-        this._indicator.add_child(box);
         box.add_child(this._icon);
+        this._indicator.add_child(box);
 
         this._header = new PopupMenu.PopupMenuItem(_('WireGuard profiles'));
         this._header.setSensitive(false);
@@ -104,21 +110,60 @@ export default class WireGuardExtension extends Extension {
         }
         for (const name of names) {
             const item = new PopupMenu.PopupSwitchMenuItem(name, false);
-            item.connect('toggled', (it, wantUp) => {
-                if (this._syncing)
+            const id = item.connect('toggled', (it, wantUp) => {
+                if (this._inflight.has(name))
                     return;
-                this._toggle(name, wantUp, it);
+                this._toggle(name, wantUp);
             });
             this._section.addMenuItem(item);
-            this._items.set(name, item);
+            this._items.set(name, {item, id});
+        }
+    }
+
+    _setSwitch(name, state) {
+        const entry = this._items.get(name);
+        if (!entry)
+            return;
+        if (entry.item.state === state)
+            return;
+        GObject.signal_handler_block(entry.item, entry.id);
+        try {
+            entry.item.setToggleState(state);
+        } finally {
+            GObject.signal_handler_unblock(entry.item, entry.id);
         }
     }
 
     _pollStates() {
-        this._spawn(['ip', '-o', 'link', 'show', 'type', 'wireguard'], true,
-            (status, lines) => {
-                this._applyStates(status === 0 ? (lines ?? []).join('\n') : '');
+        try {
+            const flags = GLib.SpawnFlags.SEARCH_PATH |
+                          GLib.SpawnFlags.DO_NOT_REAP_CHILD;
+            const res = GLib.spawn_async_with_pipes(null,
+                ['ip', '-o', 'link', 'show', 'type', 'wireguard'],
+                null, flags, null);
+            const decoder = new TextDecoder();
+            const stream = new Gio.DataInputStream({
+                base_stream: new Gio.UnixInputStream({fd: res[3], close_fd: true}),
             });
+            const lines = [];
+            const readLine = () => stream.read_line_async(
+                GLib.PRIORITY_DEFAULT, null, (s, result) => {
+                    const [line, length] = stream.read_line_finish(result);
+                    if (line !== null) {
+                        if (length > 0)
+                            lines.push(decoder.decode(line));
+                        readLine();
+                    } else {
+                        stream.close(null);
+                        GLib.spawn_close_pid(res[1]);
+                        this._applyStates(lines.join('\n'));
+                    }
+                });
+            readLine();
+        } catch (e) {
+            log(`wireguard: ip failed: ${e}`);
+            this._applyStates('');
+        }
     }
 
     _applyStates(out) {
@@ -130,22 +175,21 @@ export default class WireGuardExtension extends Extension {
         if (this._icon)
             this._icon.set_opacity(active.size > 0 ? 255 : 140);
 
-        this._syncing = true;
-        for (const [name, item] of this._items)
-            item.setToggleState(active.has(name));
-        this._syncing = false;
+        for (const name of this._items.keys())
+            this._setSwitch(name, active.has(name));
     }
 
-    _toggle(name, wantUp, item) {
-        // Revert the switch until the command actually succeeds; the
-        // refresh after completion sets the real state.
-        item.setToggleState(!wantUp);
-        item.setSensitive(false);
+    _toggle(name, wantUp) {
+        if (this._inflight.has(name))
+            return;
+        this._inflight.add(name);
 
-        // CRITICAL: close the menu before spawning pkexec. The polkit
-        // password dialog is rendered by gnome-shell itself; keeping this
-        // menu's modal grab open at the same time deadlocks the shell —
-        // and with it the whole Wayland session.
+        const entry = this._items.get(name);
+        if (entry)
+            entry.item.setSensitive(false);
+
+        // Close the menu before spawning: no grab should be held while a
+        // privileged command runs.
         this._indicator.menu.close();
 
         try {
@@ -155,12 +199,16 @@ export default class WireGuardExtension extends Extension {
             const [, pid] = GLib.spawn_async(null, argv, null, flags, null);
             GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, (p, status) => {
                 GLib.spawn_close_pid(p);
-                item.setSensitive(true);
+                this._inflight.delete(name);
+                if (entry)
+                    entry.item.setSensitive(true);
                 this._pollStates();
             });
         } catch (e) {
             log(`wireguard: failed to run wg-quick: ${e}`);
-            item.setSensitive(true);
+            this._inflight.delete(name);
+            if (entry)
+                entry.item.setSensitive(true);
             this._pollStates();
         }
     }
