@@ -16,6 +16,7 @@ gext install AlphabeticalAppGrid@stuarthayhurst
 gext install clipboard-indicator@tudmotu.com
 gext install appindicatorsupport@rgcjonas.gmail.com
 gext install top-bar-organizer-plus@shibasishpaul.github.com
+gext install display-configuration-switcher@knokelmaat.gitlab.com
 
 # Compile gsettings schemas in order to be able to set them
 sudo cp ~/.local/share/gnome-shell/extensions/tactile@lundal.io/schemas/org.gnome.shell.extensions.tactile.gschema.xml /usr/share/glib-2.0/schemas/
@@ -27,6 +28,7 @@ sudo cp ~/.local/share/gnome-shell/extensions/AlphabeticalAppGrid\@stuarthayhurs
 sudo cp ~/.local/share/gnome-shell/extensions/clipboard-indicator\@tudmotu.com/schemas/org.gnome.shell.extensions.clipboard-indicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/appindicatorsupport\@rgcjonas.gmail.com/schemas/org.gnome.shell.extensions.appindicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/top-bar-organizer-plus\@shibasishpaul.github.com/schemas/org.gnome.shell.extensions.top-bar-organizer-plus.gschema.xml /usr/share/glib-2.0/schemas/
+sudo cp ~/.local/share/gnome-shell/extensions/display-configuration-switcher\@knokelmaat.gitlab.com/schemas/org.gnome.shell.extensions.display-configuration-switcher.gschema.xml /usr/share/glib-2.0/schemas/
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Configure Tactile
