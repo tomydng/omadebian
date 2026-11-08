@@ -39,11 +39,12 @@ export default class PlanifyLauncherExtension extends Extension {
             // real hardware pointer; a large gap means phantom click.
             const [ex, ey] = event.get_coords();
             const [px, py] = global.get_pointer();
+            log(`planify-launcher: BUTTON click event=(${ex},${ey}) pointer=(${px},${py})`);
             if (Math.abs(ex - px) > 30 || Math.abs(ey - py) > 30) {
-                log(`planify-launcher: ignored desynced click, event at ${ex},${ey} but pointer at ${px},${py}`);
+                log(`planify-launcher: ignored desynced click`);
                 return true;
             }
-            log('planify-launcher: BUTTON clicked');
+            log('planify-launcher: BUTTON accepted');
             this._present();
             return true;
         });
