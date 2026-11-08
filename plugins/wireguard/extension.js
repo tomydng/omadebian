@@ -16,11 +16,12 @@ export default class WireGuardExtension extends Extension {
 
         this._indicator = new PanelMenu.Button(0.0, 'WireGuard');
         const box = new St.BoxLayout({style_class: 'panel-status-menu-box'});
-        box.add_child(new St.Icon({
+        this._icon = new St.Icon({
             gicon: Gio.icon_new_for_string(`${this.path}/icons/wireguard.svg`),
             style_class: 'system-status-icon',
-        }));
+        });
         this._indicator.add_child(box);
+        box.add_child(this._icon);
 
         this._header = new PopupMenu.PopupMenuItem(_('WireGuard profiles'));
         this._header.setSensitive(false);
@@ -31,7 +32,7 @@ export default class WireGuardExtension extends Extension {
         this._indicator.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this._indicator.menu.addAction(_('Refresh'), () => {
             this._loadProfiles();
-            this._refreshStates();
+            this._pollStates();
         });
 
         Main.panel.addToStatusArea(this.uuid, this._indicator, 11, 'right');
@@ -39,16 +40,29 @@ export default class WireGuardExtension extends Extension {
         this._openId = this._indicator.menu.connect('open-state-changed',
             (menu, open) => {
                 if (open)
-                    this._refreshStates();
+                    this._pollStates();
             });
 
         // Profile listing is unprivileged (install.sh makes /etc/wireguard
         // world-listable; the .conf files stay root-only), so nothing here
         // can trigger a polkit prompt.
         this._loadProfiles();
+
+        // Keep the icon state (dim when disconnected) fresh without
+        // opening the menu. The check is unprivileged and cheap.
+        this._pollId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 5,
+            () => {
+                this._pollStates();
+                return GLib.SOURCE_CONTINUE;
+            });
+        this._pollStates();
     }
 
     disable() {
+        if (this._pollId) {
+            GLib.source_remove(this._pollId);
+            this._pollId = null;
+        }
         if (this._openId && this._indicator)
             this._indicator.menu.disconnect(this._openId);
         this._openId = null;
@@ -56,6 +70,7 @@ export default class WireGuardExtension extends Extension {
             this._indicator.destroy();
             this._indicator = null;
         }
+        this._icon = null;
         this._items.clear();
     }
 
@@ -99,19 +114,21 @@ export default class WireGuardExtension extends Extension {
         }
     }
 
-    _refreshStates() {
-        // Interface state is readable without privileges.
-        let out = '';
-        try {
-            const [, stdout] = GLib.spawn_command_line_sync(
-                'ip -o link show type wireguard');
-            out = new TextDecoder().decode(stdout);
-        } catch (e) {
-            out = '';
-        }
+    _pollStates() {
+        this._spawn(['ip', '-o', 'link', 'show', 'type', 'wireguard'], true,
+            (status, lines) => {
+                this._applyStates(status === 0 ? (lines ?? []).join('\n') : '');
+            });
+    }
+
+    _applyStates(out) {
         const active = new Set();
         for (const match of out.matchAll(/^\d+:\s*([\w.-]+):/gm))
             active.add(match[1]);
+
+        // Dim the dragon while no tunnel is up.
+        if (this._icon)
+            this._icon.set_opacity(active.size > 0 ? 255 : 140);
 
         this._syncing = true;
         for (const [name, item] of this._items)
@@ -139,12 +156,12 @@ export default class WireGuardExtension extends Extension {
             GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, (p, status) => {
                 GLib.spawn_close_pid(p);
                 item.setSensitive(true);
-                this._refreshStates();
+                this._pollStates();
             });
         } catch (e) {
             log(`wireguard: failed to run wg-quick: ${e}`);
             item.setSensitive(true);
-            this._refreshStates();
+            this._pollStates();
         }
     }
 }
