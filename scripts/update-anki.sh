@@ -19,11 +19,13 @@ else
     echo "⚠️  Anki install not found at $ANKI_HOME, skipping..."
     exit 0
 fi
-foreign="$(readlink -f /usr/local/bin/anki 2>/dev/null || true)"
-managed="$(readlink -f "$HOME/.local/bin/anki" 2>/dev/null || true)"
-if [ -n "$foreign" ] && [ "$foreign" != "$managed" ]; then
-    echo "⚠️  Anki: stale copy also installed at /usr/local — remove it to avoid update nags:"
-    echo "    sudo rm /usr/local/bin/anki && sudo rm -rf /usr/local/share/anki"
+if [ -e /usr/local/bin/anki ]; then
+    foreign="$(readlink -f /usr/local/bin/anki 2>/dev/null || true)"
+    managed="$(readlink -f "$HOME/.local/bin/anki" 2>/dev/null || true)"
+    if [ -n "$foreign" ] && [ "$foreign" != "$managed" ]; then
+        echo "⚠️  Anki: stale copy also installed at /usr/local — remove it to avoid update nags:"
+        echo "    sudo rm /usr/local/bin/anki && sudo rm -rf /usr/local/share/anki"
+    fi
 fi
 
 current="$(basename "$(readlink -f "$ANKI_HOME/current" 2>/dev/null || true)")"
