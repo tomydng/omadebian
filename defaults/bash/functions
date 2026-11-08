@@ -152,5 +152,11 @@ update-all() {
         echo "⚠️  Snap not found, skipping..."
     fi
 
+    ANKI_UPDATER="$HOME/.local/share/omadebian/scripts/update-anki.sh"
+    if [ -x "$ANKI_UPDATER" ]; then
+        echo "🔄 Updating Anki..."
+        "$ANKI_UPDATER"
+    fi
+
     echo "✅ All updates completed!"
 }
