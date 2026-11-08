@@ -98,11 +98,12 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/ command 'gnome-session-quit --reboot'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/ binding '<Shift><Super>r'
 
-# custom8: Zalo (PWA) — Shift+Super+Z
-# --class=zalo gives the window a unique WM_CLASS so GNOME groups it under
-# the Zalo desktop entry (StartupWMClass=zalo) instead of Chromium.
+# custom8: Zalo — Shift+Super+Z
+# Runs in a dedicated chromium profile/process (own user-data-dir) with
+# --class=zalo + X11 ozone, so GNOME always groups it under zalo.desktop
+# (StartupWMClass=zalo) and never confuses it with regular Chromium.
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/ name 'Zalo'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/ command 'flatpak run --command=/app/bin/chromium org.chromium.Chromium --profile-directory=Default --app-id=khmlcabibblfpfhmkfpaiblbijoggmaa --class=zalo'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/ command 'flatpak run --command=/app/bin/chromium org.chromium.Chromium --user-data-dir=/home/tomydng/.local/share/zalo-pwa --class=zalo --ozone-platform=x11 --app=https://zalo.me/'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/ binding '<Shift><Super>z'
 
 # custom9: Toggle Fcitx5 input method — Super+I (global, works outside text fields on Wayland)
