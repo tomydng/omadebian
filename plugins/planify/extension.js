@@ -21,6 +21,7 @@ export default class PlanifyLauncherExtension extends Extension {
         }));
         this._indicator.add_child(box);
         this._indicator.connect('button-press-event', () => {
+            log('planify-launcher: BUTTON clicked');
             this._present();
             return true;
         });
@@ -31,7 +32,10 @@ export default class PlanifyLauncherExtension extends Extension {
         Main.wm.addKeybinding('toggle-binding', this._settings,
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-            () => this._present());
+            () => {
+                log('planify-launcher: KEYBINDING fired');
+                this._present();
+            });
     }
 
     disable() {
