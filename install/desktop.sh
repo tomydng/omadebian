@@ -32,6 +32,7 @@ sudo apt install -y vlc flameshot gnome-sushi gnome-tweaks wl-clipboard obs-stud
 flatpak install -y flathub \
   com.bitwarden.desktop \
   com.usebruno.Bruno \
+  io.github.alainm23.planify \
   org.gimp.GIMP \
   com.mongodb.Compass || true
 
