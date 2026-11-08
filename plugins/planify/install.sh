@@ -3,8 +3,10 @@ set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 uuid='planify@tomydng.local'
 mkdir -p "$project_dir/dist"
+glib-compile-schemas --strict "$project_dir/schemas"
 gnome-extensions pack --force --out-dir="$project_dir/dist" \
-  --extra-source=icons "$project_dir"
+  --extra-source=icons \
+  --schema=schemas/org.gnome.shell.extensions.planify.gschema.xml "$project_dir"
 if [[ "${1:-}" == '--pack-only' ]]; then
   printf 'Built: %s/dist/%s.shell-extension.zip\n' "$project_dir" "$uuid"
   exit 0

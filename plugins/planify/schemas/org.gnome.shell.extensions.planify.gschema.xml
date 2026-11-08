@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.planify" path="/org/gnome/shell/extensions/planify/">
+    <key name="toggle-binding" type="as">
+      <default><![CDATA[['<Super>n']]]></default>
+      <summary>Shortcut to present Planify</summary>
+      <description>Focus Planify from any workspace, or launch it when not running.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,7 +1,8 @@
 {
   "uuid": "planify@tomydng.local",
   "name": "Planify Launcher",
-  "description": "Planify (notes & tasks) launcher button for the GNOME top bar, next to the tray icons.",
+  "description": "Planify (notes & tasks) launcher: a top bar button and a Super+N shortcut that presents Planify from any workspace, launching it when not running.",
   "shell-version": ["48"],
-  "version": 1
+  "version": 2,
+  "settings-schema": "org.gnome.shell.extensions.planify"
 }
