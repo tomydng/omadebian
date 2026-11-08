@@ -21,6 +21,17 @@ export default class PlanifyLauncherExtension extends Extension {
         }));
         this._indicator.add_child(box);
         this._indicator.connect('button-press-event', () => {
+            // Ignore phantom clicks: while another panel menu holds the
+            // pointer grab, its release can be misrouted to arbitrary panel
+            // buttons. Only act when the pointer is really over this icon.
+            const [px, py] = global.get_pointer();
+            const [ok, sx, sy] = this._indicator.get_transformed_position();
+            const w = this._indicator.allocation.x2 - this._indicator.allocation.x1;
+            const h = this._indicator.allocation.y2 - this._indicator.allocation.y1;
+            if (!ok || px < sx || px > sx + w || py < sy || py > sy + h) {
+                log(`planify-launcher: ignored phantom click at ${px},${py} (icon at ${sx},${sy} ${w}x${h})`);
+                return true;
+            }
             log('planify-launcher: BUTTON clicked');
             this._present();
             return true;
