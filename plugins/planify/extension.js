@@ -1,4 +1,5 @@
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import St from 'gi://St';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -12,7 +13,7 @@ export default class PlanifyLauncherExtension extends Extension {
         this._indicator = new PanelMenu.Button(0.0, 'Planify', true);
         const box = new St.BoxLayout({style_class: 'panel-status-menu-box'});
         box.add_child(new St.Icon({
-            icon_name: 'task-due-symbolic',
+            gicon: Gio.icon_new_for_string(`${this.path}/icons/planify.svg`),
             style_class: 'system-status-icon',
         }));
         this._indicator.add_child(box);
