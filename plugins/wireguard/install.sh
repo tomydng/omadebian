@@ -11,8 +11,10 @@ if [[ "${1:-}" == '--pack-only' ]]; then
 fi
 gnome-extensions install --force "$project_dir/dist/$uuid.shell-extension.zip"
 
-# polkit rule: remember the authorization for wg-quick and listing
-# /etc/wireguard during the session (one password prompt per session).
+# polkit rule: remember the wg-quick authorization during the session
+# (one password prompt on the first toggle). Also make /etc/wireguard
+# listable so reading profile names needs no privileges at all; the
+# .conf files themselves stay root-only (mode 600).
 if sudo -n true 2>/dev/null; then
   SUDO=sudo
 elif [[ -t 0 ]]; then
@@ -23,10 +25,12 @@ fi
 if [[ -n "$SUDO" ]]; then
   "$SUDO" cp "$project_dir/polkit/50-omadebian-wireguard.rules" \
     /etc/polkit-1/rules.d/
-  printf 'Polkit rule installed (auth_keep per session).\n'
+  "$SUDO" chmod 755 /etc/wireguard
+  printf 'Polkit rule installed; /etc/wireguard is now listable.\n'
 else
   printf 'NOTE: run this once manually:\n'
   printf '  sudo cp %s/polkit/50-omadebian-wireguard.rules /etc/polkit-1/rules.d/\n' "$project_dir"
+  printf '  sudo chmod 755 /etc/wireguard\n'
 fi
 
 if gnome-extensions enable "$uuid" 2>/dev/null; then
