@@ -12,3 +12,12 @@ fi
 
 sudo apt update
 sudo apt install -y code
+
+# Restore the curated extension set (configs/vscode-extensions.txt)
+ext_list="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)/configs/vscode-extensions.txt"
+if [ -f "$ext_list" ]; then
+  echo "Installing VSCode extensions from $ext_list..."
+  while read -r ext; do
+    [ -n "$ext" ] && code --install-extension "$ext" >/dev/null 2>&1 || true
+  done < "$ext_list"
+fi
