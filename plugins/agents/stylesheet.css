@@ -55,3 +55,13 @@
 .agents-light .agents-status { color: #84705f; }
 .agents-light .agents-signin { color: #a35e40; }
 .agents-light .agents-danger { color: #bd444b; }
+
+/* Restore roomy padding on the screen-share/recording pills: the global
+   Just Perfection panel-button-padding squeeze (4px) makes their orange
+   background hug the icon and look clipped. The ID selector outranks the
+   extension class, so these two pills keep their intended shape. */
+#panel .panel-button.screen-recording-indicator,
+#panel .panel-button.screen-sharing-indicator {
+    -natural-hpadding: 12px;
+    -minimum-hpadding: 6px;
+}
