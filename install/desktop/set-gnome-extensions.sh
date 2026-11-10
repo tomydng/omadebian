@@ -17,6 +17,7 @@ gext install clipboard-indicator@tudmotu.com
 gext install appindicatorsupport@rgcjonas.gmail.com
 gext install top-bar-organizer-plus@shibasishpaul.github.com
 gext install display-configuration-switcher@knokelmaat.gitlab.com
+gext install notification-banner@VitalyOstanin
 
 # Compile gsettings schemas in order to be able to set them
 sudo cp ~/.local/share/gnome-shell/extensions/tactile@lundal.io/schemas/org.gnome.shell.extensions.tactile.gschema.xml /usr/share/glib-2.0/schemas/
@@ -29,6 +30,7 @@ sudo cp ~/.local/share/gnome-shell/extensions/clipboard-indicator\@tudmotu.com/s
 sudo cp ~/.local/share/gnome-shell/extensions/appindicatorsupport\@rgcjonas.gmail.com/schemas/org.gnome.shell.extensions.appindicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/top-bar-organizer-plus\@shibasishpaul.github.com/schemas/org.gnome.shell.extensions.top-bar-organizer-plus.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/display-configuration-switcher\@knokelmaat.gitlab.com/schemas/org.gnome.shell.extensions.display-configuration-switcher.gschema.xml /usr/share/glib-2.0/schemas/
+sudo cp ~/.local/share/gnome-shell/extensions/notification-banner\@VitalyOstanin/schemas/org.gnome.shell.extensions.notification-banner.gschema.xml /usr/share/glib-2.0/schemas/
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Configure Tactile
@@ -78,6 +80,12 @@ gsettings set org.gnome.shell.extensions.tophat network-usage-unit bits
 gsettings set org.gnome.shell.extensions.tophat mem-abs-units true
 gsettings set org.gnome.shell.extensions.tophat mem-display numeric
 gsettings set org.gnome.shell.extensions.tophat cpu-display numeric
+
+# Configure Notification Banner (macOS-style: top-right with a small margin)
+gsettings set org.gnome.shell.extensions.notification-banner horizontal-position 'right'
+gsettings set org.gnome.shell.extensions.notification-banner vertical-position 'top'
+gsettings set org.gnome.shell.extensions.notification-banner padding-horizontal 8
+gsettings set org.gnome.shell.extensions.notification-banner padding-vertical 8
 
 # Configure Top Bar Organizer Plus (panel item order)
 gsettings set org.gnome.shell.extensions.top-bar-organizer-plus left-box-order "['activities', 'Space Bar']"
