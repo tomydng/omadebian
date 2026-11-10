@@ -29,6 +29,11 @@ if [[ -n "$SUDO" ]]; then
     /etc/NetworkManager/conf.d/
   "$SUDO" chmod 755 /etc/wireguard
   "$SUDO" nmcli general reload 2>/dev/null || true
+  # Bring every profile up at boot via the shipped wg-quick@ units.
+  for conf in /etc/wireguard/*.conf; do
+    [[ -e "$conf" ]] || continue
+    "$SUDO" systemctl enable "wg-quick@$(basename "$conf" .conf)" 2>/dev/null || true
+  done
   printf 'Polkit + NetworkManager rules installed; /etc/wireguard listable.\n'
 else
   printf 'NOTE: run this once manually:\n'
