@@ -81,8 +81,8 @@ gsettings set org.gnome.shell.extensions.tophat mem-abs-units true
 gsettings set org.gnome.shell.extensions.tophat mem-display numeric
 gsettings set org.gnome.shell.extensions.tophat cpu-display numeric
 
-# Configure Notification Banner (macOS-style: top-right with a small margin)
-gsettings set org.gnome.shell.extensions.notification-banner horizontal-position 'right'
+# Configure Notification Banner (banner: top-center with a small margin)
+gsettings set org.gnome.shell.extensions.notification-banner horizontal-position 'center'
 gsettings set org.gnome.shell.extensions.notification-banner vertical-position 'top'
 gsettings set org.gnome.shell.extensions.notification-banner padding-horizontal 8
 gsettings set org.gnome.shell.extensions.notification-banner padding-vertical 8
