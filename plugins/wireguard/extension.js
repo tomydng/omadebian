@@ -42,7 +42,7 @@ export default class WireGuardExtension extends Extension {
             this._pollStates();
         });
 
-        Main.panel.addToStatusArea(this.uuid, this._indicator, 0, 'right');
+        Main.panel.addToStatusArea(this.uuid, this._indicator, 2, 'right');
 
         this._openId = this._indicator.menu.connect('open-state-changed',
             (menu, open) => {

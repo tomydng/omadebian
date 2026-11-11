@@ -72,9 +72,8 @@
    mixed -hpadding values that made some icons look far apart and others
    squeezed. #panel outranks Just Perfection's class-based rules. */
 #panel .panel-button {
-    -natural-hpadding: 0px;
-    -minimum-hpadding: 0px;
-    padding: 7px;
+    -natural-hpadding: 7px;
+    -minimum-hpadding: 7px;
 }
 /* The theme gives .system-status-icon its own padding (0 6px), which stacks
    with the button padding — icons using it look twice as wide-spaced as

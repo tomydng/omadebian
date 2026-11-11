@@ -51,7 +51,7 @@ export default class PlanifyLauncherExtension extends Extension {
         });
         // Insert deep enough to land inside the tray cluster at the end of
         // the right box; Top Bar Organizer appends unknown items there.
-        Main.panel.addToStatusArea(this.uuid, this._indicator, 0, 'right');
+        Main.panel.addToStatusArea(this.uuid, this._indicator, 3, 'right');
 
         Main.wm.addKeybinding('toggle-binding', this._settings,
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
