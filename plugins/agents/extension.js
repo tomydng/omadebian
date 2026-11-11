@@ -52,6 +52,16 @@ export default class AgentsExtension extends Extension {
         this._buildPanel();
         this._themeChanged();
         Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'right');
+
+        // Keep TopHat leading the right cluster: tray icons that register
+        // late always steal index 0, so re-pin it once login settles.
+        this._tophatPinId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 8,
+            () => {
+                const tophat = Main.panel.statusArea['TopHat'];
+                if (tophat && Main.panel._rightBox)
+                    Main.panel._rightBox.set_child_at_index(tophat.container, 0);
+                return GLib.SOURCE_REMOVE;
+            });
         this._settingsId = this._settings.connect('changed', () => {
             this._scheduleRefresh();
             this._updateLabels();
