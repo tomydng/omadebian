@@ -53,14 +53,24 @@ export default class AgentsExtension extends Extension {
         this._themeChanged();
         Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'right');
 
-        // Keep TopHat leading the right cluster: tray icons that register
-        // late always steal index 0, so re-pin it once login settles.
-        this._tophatPinId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 8,
+        // Keep TopHat leading the right cluster forever: any icon that
+        // registers later inserts at index 0 and steals the spot, so watch
+        // the right box and re-pin whenever its child count changes (a
+        // pure count check cannot loop, unlike an unconditional sort).
+        this._pinCount = -1;
+        this._tophatPinId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 2,
             () => {
-                const tophat = Main.panel.statusArea['TopHat'];
-                if (tophat && Main.panel._rightBox)
-                    Main.panel._rightBox.set_child_at_index(tophat.container, 0);
-                return GLib.SOURCE_REMOVE;
+                const box = Main.panel._rightBox;
+                if (!box)
+                    return GLib.SOURCE_CONTINUE;
+                const count = box.get_children().length;
+                if (count !== this._pinCount) {
+                    this._pinCount = count;
+                    const tophat = Main.panel.statusArea['TopHat'];
+                    if (tophat)
+                        box.set_child_at_index(tophat.container, 0);
+                }
+                return GLib.SOURCE_CONTINUE;
             });
         this._settingsId = this._settings.connect('changed', () => {
             this._scheduleRefresh();
