@@ -15,7 +15,6 @@ gext install tophat@fflewddur.github.io
 gext install AlphabeticalAppGrid@stuarthayhurst
 gext install clipboard-indicator@tudmotu.com
 gext install appindicatorsupport@rgcjonas.gmail.com
-gext install multi-monitors-bar@frederykabryan
 gext install notification-banner@VitalyOstanin
 
 # Compile gsettings schemas in order to be able to set them
@@ -27,7 +26,6 @@ sudo cp ~/.local/share/gnome-shell/extensions/tophat@fflewddur.github.io/schemas
 sudo cp ~/.local/share/gnome-shell/extensions/AlphabeticalAppGrid\@stuarthayhurst/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/clipboard-indicator\@tudmotu.com/schemas/org.gnome.shell.extensions.clipboard-indicator.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/appindicatorsupport\@rgcjonas.gmail.com/schemas/org.gnome.shell.extensions.appindicator.gschema.xml /usr/share/glib-2.0/schemas/
-sudo cp ~/.local/share/gnome-shell/extensions/multi-monitors-bar\@frederykabryan/schemas/org.gnome.shell.extensions.multi-monitors-bar.gschema.xml /usr/share/glib-2.0/schemas/
 sudo cp ~/.local/share/gnome-shell/extensions/notification-banner\@VitalyOstanin/schemas/org.gnome.shell.extensions.notification-banner.gschema.xml /usr/share/glib-2.0/schemas/
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 
@@ -85,9 +83,6 @@ gsettings set org.gnome.shell.extensions.notification-banner vertical-position '
 gsettings set org.gnome.shell.extensions.notification-banner padding-horizontal 8
 gsettings set org.gnome.shell.extensions.notification-banner padding-vertical 8
 
-# Configure Multi Monitor Bar (top bar on every monitor). NOTE: incompatible
-# with Top Bar Organizer Plus (both arrange the same indicators -> stacking).
-gsettings set org.gnome.shell.extensions.multi-monitors-bar show-app-indicators true
 
 # Configure AlphabeticalAppGrid
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position 'end'
@@ -105,4 +100,3 @@ bash "$OMADEBIAN_PATH/scripts/patch-kimpanel.sh"
 bash "$OMADEBIAN_PATH/plugins/agents/install.sh"
 bash "$OMADEBIAN_PATH/plugins/planify/install.sh"
 bash "$OMADEBIAN_PATH/plugins/wireguard/install.sh"
-bash "$OMADEBIAN_PATH/plugins/panel-order/install.sh"
