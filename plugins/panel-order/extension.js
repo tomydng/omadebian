@@ -4,8 +4,11 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 // Desired order of the right box, by statusArea role. Anything not listed
 // (tray icons, late-loading extensions) keeps its relative order after the
-// listed ones. Only set_child_at_index is used — no actor is reparented,
-// so Multi Monitor Bar's mirrored panels are not disturbed.
+// listed ones. Only set_child_at_index is used — no actor is reparented.
+//
+// Re-applying happens at most once per children-count change: a periodic
+// unconditional sort made Multi Monitor Bar rebuild its mirrors endlessly
+// (feedback storm), so v2 watches the count instead of the order.
 const RIGHT_ORDER = [
     'agents@tomydng.local',
     'screenRecording',
@@ -21,12 +24,13 @@ const RIGHT_ORDER = [
 
 export default class PanelOrderExtension extends Extension {
     enable() {
+        this._lastCount = -1;
         this._apply();
-        // Extensions and tray icons register at unpredictable times; a light
-        // periodic check re-applies the order whenever children change.
-        this._timerId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 3,
+        this._timerId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 2,
             () => {
-                this._apply();
+                const count = Main.panel._rightBox?.get_children().length ?? 0;
+                if (count !== this._lastCount)
+                    this._apply();
                 return GLib.SOURCE_CONTINUE;
             });
     }
@@ -42,38 +46,25 @@ export default class PanelOrderExtension extends Extension {
         const box = Main.panel._rightBox;
         if (!box)
             return;
+        const children = box.get_children();
+        this._lastCount = children.length;
 
         // Map each child to its statusArea role.
-        const roles = {};
+        const roles = new Map();
         for (const [role, indicator] of Object.entries(Main.panel.statusArea)) {
             if (indicator?.container)
-                roles[indicator.container] = role;
+                roles.set(indicator.container, role);
         }
 
-        const children = box.get_children();
-        const indexed = children.map((child, position) => ({
-            child,
-            position,
-            role: roles[child] ?? null,
-        }));
-
-        // Stable sort: listed roles first in RIGHT_ORDER sequence, everything
-        // else after, preserving current relative order.
-        const rankOf = item => {
-            const idx = item.role ? RIGHT_ORDER.indexOf(item.role) : -1;
+        const rank = child => {
+            const role = roles.get(child);
+            const idx = role ? RIGHT_ORDER.indexOf(role) : -1;
             return idx === -1 ? RIGHT_ORDER.length : idx;
         };
-        const sorted = [...indexed].sort((a, b) =>
-            (rankOf(a) - rankOf(b)) || (a.position - b.position));
 
-        let changed = false;
-        sorted.forEach((item, i) => {
-            if (children[i] !== item.child) {
-                box.set_child_at_index(item.child, i);
-                changed = true;
-            }
-        });
-        if (changed)
-            box.queue_relayout();
+        // Desired sequence: listed roles in order, the rest after in their
+        // current relative order. Apply in one straight pass.
+        const sorted = [...children].sort((a, b) => rank(a) - rank(b));
+        sorted.forEach((child, i) => box.set_child_at_index(child, i));
     }
 }

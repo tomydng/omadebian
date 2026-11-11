@@ -3,5 +3,5 @@
   "name": "Panel Order",
   "description": "Keep the main panel's right box in a fixed order (light replacement for Top Bar Organizer, which conflicts with Multi Monitor Bar).",
   "shell-version": ["48"],
-  "version": 1
+  "version": 2
 }
