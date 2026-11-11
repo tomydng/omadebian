@@ -58,7 +58,13 @@ export default class PanelOrderExtension extends Extension {
 
         const rank = child => {
             const role = roles.get(child);
-            const idx = role ? RIGHT_ORDER.indexOf(role) : -1;
+            if (!role)
+                return RIGHT_ORDER.length + 1;
+            // Tray icons sit right before quickSettings (GNOME-default look:
+            // quickSettings touches the right corner).
+            if (role.startsWith('appindicator'))
+                return RIGHT_ORDER.indexOf('quickSettings') + 0.5;
+            const idx = RIGHT_ORDER.indexOf(role);
             return idx === -1 ? RIGHT_ORDER.length : idx;
         };
 
