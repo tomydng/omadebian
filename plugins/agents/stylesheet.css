@@ -65,3 +65,15 @@
     -natural-hpadding: 12px;
     -minimum-hpadding: 6px;
 }
+
+/* Uniform spacing on Multi Monitor Bar's additional panels: they miss the
+   Just Perfection 4px padding that the main panel gets, so mirrored and
+   extension-made buttons end up with mixed default paddings. */
+.multimonitor-panel .panel-button {
+    -natural-hpadding: 4px;
+    -minimum-hpadding: 2px;
+}
+.multimonitor-panel .panel-status-menu-box,
+.multimonitor-panel .panel-status-indicators-box {
+    spacing: 4px;
+}
