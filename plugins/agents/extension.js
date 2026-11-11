@@ -1,7 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
 import Pango from 'gi://Pango';
+import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -42,6 +44,12 @@ export default class AgentsExtension extends Extension {
         this._lastStarted = 0;
         this._readerError = '';
         this._proc = null;
+
+        // Super+Shift+A toggles the quota menu without reaching for the mouse.
+        Main.wm.addKeybinding('menu-binding', this._settings,
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            () => this._indicator.menu.toggle());
         this._indicator = new PanelMenu.Button(0.0, 'Agents — remaining quota');
         const bar = box('agents-bar');
         bar.add_child(new St.Icon({gicon: this._icon('agents-symbolic.svg'), style_class: 'system-status-icon', icon_size: 20}));
@@ -365,6 +373,7 @@ export default class AgentsExtension extends Extension {
 
     disable() {
         this._active = false;
+        Main.wm.removeKeybinding('menu-binding');
         for (const key of ['_refreshTimer', '_clockTimer', '_processTimeout']) {
             if (this[key]) {
                 GLib.source_remove(this[key]);

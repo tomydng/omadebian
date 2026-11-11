@@ -15,5 +15,10 @@
       <default>300</default>
       <summary>Refresh interval in seconds</summary>
     </key>
+    <key name="menu-binding" type="as">
+      <default><![CDATA[['<Shift><Super>a']]]></default>
+      <summary>Agents</summary>
+      <description>Toggle the Agents quota menu from the top bar.</description>
+    </key>
   </schema>
 </schemalist>
