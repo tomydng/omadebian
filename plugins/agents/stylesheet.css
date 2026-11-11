@@ -74,8 +74,7 @@
 #panel .panel-button {
     -natural-hpadding: 0px;
     -minimum-hpadding: 0px;
-    margin-left: 7px;
-    margin-right: 7px;
+    padding: 7px;
 }
 /* The theme gives .system-status-icon its own padding (0 6px), which stacks
    with the button padding — icons using it look twice as wide-spaced as
