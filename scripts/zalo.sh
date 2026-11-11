@@ -16,4 +16,4 @@ exec flatpak run --command=/app/bin/chromium org.chromium.Chromium \
   --user-data-dir="$ZALO_PROFILE" \
   --class=zalo \
   --ozone-platform=x11 \
-  --app=https://chat.zalo.me/ >/dev/null 2>&1
+  --app=https://chat.zalo.me/ --window-size=1150,850 >/dev/null 2>&1
