@@ -66,14 +66,22 @@
     -minimum-hpadding: 6px;
 }
 
-/* Uniform spacing on Multi Monitor Bar's additional panels: they miss the
-   Just Perfection 4px padding that the main panel gets, so mirrored and
-   extension-made buttons end up with mixed default paddings. */
-.multimonitor-panel .panel-button {
-    -natural-hpadding: 4px;
-    -minimum-hpadding: 2px;
+
+/* Uniform panel rhythm: every button gets exactly 6px per side regardless of
+   its type (PanelMenu, legacy XEmbed tray, extension-made), overriding the
+   mixed -hpadding values that made some icons look far apart and others
+   squeezed. #panel outranks Just Perfection's class-based rules. */
+#panel .panel-button {
+    -natural-hpadding: 0px;
+    -minimum-hpadding: 0px;
+    margin-left: 7px;
+    margin-right: 7px;
 }
-.multimonitor-panel .panel-status-menu-box,
-.multimonitor-panel .panel-status-indicators-box {
-    spacing: 4px;
+/* The theme gives .system-status-icon its own padding (0 6px), which stacks
+   with the button padding — icons using it look twice as wide-spaced as
+   buttons with custom content. Neutralize so only the 6px button rule
+   decides the rhythm. */
+#panel .panel-button .system-status-icon {
+    padding: 0;
+    margin: 0;
 }

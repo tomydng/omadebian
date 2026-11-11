@@ -51,7 +51,7 @@ export default class AgentsExtension extends Extension {
         this._indicator.menu.actor.add_style_class_name('agents-menu');
         this._buildPanel();
         this._themeChanged();
-        Main.panel.addToStatusArea(this.uuid, this._indicator, 0, 'right');
+        Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'right');
         this._settingsId = this._settings.connect('changed', () => {
             this._scheduleRefresh();
             this._updateLabels();
