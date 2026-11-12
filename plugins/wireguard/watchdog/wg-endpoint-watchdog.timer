@@ -1,0 +1,9 @@
+[Unit]
+Description=Run the WireGuard endpoint watchdog every 30 seconds
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=30s
+
+[Install]
+WantedBy=timers.target

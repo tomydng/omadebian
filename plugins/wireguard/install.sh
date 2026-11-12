@@ -34,6 +34,12 @@ if [[ -n "$SUDO" ]]; then
     [[ -e "$conf" ]] || continue
     "$SUDO" systemctl enable "wg-quick@$(basename "$conf" .conf)" 2>/dev/null || true
   done
+  # Endpoint watchdog: follow DDNS rotations without toggling the tunnel.
+  "$SUDO" install -m 755 "$project_dir/watchdog/wg-endpoint-watchdog.sh" /usr/local/sbin/
+  "$SUDO" install -m 644 "$project_dir/watchdog/wg-endpoint-watchdog.service" \
+      "$project_dir/watchdog/wg-endpoint-watchdog.timer" /etc/systemd/system/
+  "$SUDO" systemctl daemon-reload
+  "$SUDO" systemctl enable --now wg-endpoint-watchdog.timer
   printf 'Polkit + NetworkManager rules installed; /etc/wireguard listable.\n'
 else
   printf 'NOTE: run this once manually:\n'

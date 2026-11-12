@@ -1,0 +1,7 @@
+[Unit]
+Description=WireGuard endpoint watchdog for h3tech (DDNS follow)
+After=wg-quick@h3tech.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/wg-endpoint-watchdog.sh
