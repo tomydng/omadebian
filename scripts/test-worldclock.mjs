@@ -10,6 +10,7 @@
 // audited against the installed gnome-shell source instead.
 
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 import System from 'system';
 
 const scriptPath = GLib.filename_from_uri(import.meta.url)[0];
@@ -112,6 +113,19 @@ check('add_days / difference agree', GLib.DateTime.new(HCM, 2026, 11, 13, 0, 0, 
 check('ZONE_CATALOG non-empty, all parse as zones',
     lib.ZONE_CATALOG.length >= 15 &&
     lib.ZONE_CATALOG.every(z => GLib.TimeZone.new(z) !== null));
+
+print('bundled icon asset (Adwaita has no globe symbolic)');
+const iconPath = `${repoRoot}/plugins/worldclock/icons/globe.svg`;
+check('globe.svg ships with the plugin',
+    GLib.file_test(iconPath, GLib.FileTest.EXISTS));
+check('FileIcon constructible for it',
+    Gio.FileIcon.new(Gio.File.new_for_path(iconPath)) !== null);
+check('pack script bundles the icons dir',
+    (() => {
+        const sh = imports.byteArray.toString(
+            GLib.file_get_contents(`${repoRoot}/plugins/worldclock/install.sh`)[1]);
+        return sh.includes('--extra-source=icons');
+    })());
 
 print('');
 if (failures > 0) {

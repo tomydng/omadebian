@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -78,14 +79,16 @@ function parseConvertText(text, refZone) {
 const WorldClockIndicator = GObject.registerClass(
 class WorldClockIndicator extends PanelMenu.Button {
     _init(extension) {
-        super._init(0.0, 'World Clock', false);
+        super._init(0.5, 'World Clock', false);
         this._extension = extension;
         this._settings = extension.getSettings();
         this._rows = [];
         this._tickCount = 0;
 
+        // Adwaita ships no globe symbolic, so the extension bundles its own.
         this._icon = new St.Icon({
-            icon_name: 'applications-internet-symbolic',
+            gicon: Gio.FileIcon.new(Gio.File.new_for_path(
+                GLib.build_filenamev([extension.path, 'icons', 'globe.svg']))),
             style_class: 'system-status-icon',
         });
         this._barLabel = new St.Label({
