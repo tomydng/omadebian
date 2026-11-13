@@ -242,6 +242,18 @@ class WorldClockIndicator extends PanelMenu.Button {
         const iconSize = this._settings.get_int('icon-size');
         this._icon.style =
             `font-family: "CaskaydiaMono Nerd Font"; font-size: ${iconSize}px;`;
+        // Optically center the glyph: nerd-font glyphs have asymmetric
+        // bearings (the drawing sits off-center inside its advance box).
+        // translation_x is a pure paint offset — it cannot disturb layout,
+        // unlike margins/padding.
+        try {
+            const layout = this._icon.clutter_text.get_layout();
+            const [ink, logical] = layout.get_pixel_extents();
+            this._icon.translation_x =
+                (logical.width / 2) - (ink.x + ink.width / 2);
+        } catch {
+            // cosmetic only — never take the bar down over it
+        }
     }
 
     _refresh() {
