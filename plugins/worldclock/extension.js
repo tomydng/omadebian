@@ -272,13 +272,11 @@ class WorldClockIndicator extends PanelMenu.Button {
 
         const mode = this._settings.get_string('bar-mode');
         const first = this._rows[0];
-        // Always visible: an empty label keeps the box spacing alive, which
-        // is what gives the hover halo its width in icon mode.
-        this._barLabel.visible = true;
+        // Hidden in icon mode: any trailing actor (even 1px) would push the
+        // glyph off the pill's center.
+        this._barLabel.visible = mode === 'time' && !!first;
         if (first && mode === 'time')
             this._barLabel.text = `${first.name} ${GLib.DateTime.new_now(first.zone).format(fmt)}`;
-        else
-            this._barLabel.text = '';
     }
 });
 
