@@ -91,10 +91,11 @@ class WorldClockIndicator extends PanelMenu.Button {
             gicon: Gio.FileIcon.new(Gio.File.new_for_path(
                 GLib.build_filenamev([extension.path, 'icons', 'globe.svg']))),
             style_class: 'system-status-icon',
-            style: 'margin-top: -1px;',   // optical nudge up
         });
-        // Sit closer to the GNOME clock on the left.
-        this.style = 'margin-right: -5px;';
+        // Sit closer to the GNOME clock: shrink this button's horizontal
+        // padding (positive values only — negative margins corrupt St
+        // allocations with uint32-wrapped widths).
+        this.style = '-natural-hpadding: 2px; -minimum-hpadding: 2px;';
         this._barLabel = new St.Label({
             y_align: Clutter.ActorAlign.CENTER,
             style: 'font-weight: bold;',
