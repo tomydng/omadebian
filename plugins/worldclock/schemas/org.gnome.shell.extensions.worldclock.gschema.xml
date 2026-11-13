@@ -1,0 +1,25 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.worldclock" path="/org/gnome/shell/extensions/worldclock/">
+    <key name="locations" type="as">
+      <default>['Asia/Ho_Chi_Minh', 'Asia/Tokyo', 'Asia/Singapore', 'Europe/London', 'America/New_York']</default>
+      <summary>Cities shown in the popup</summary>
+      <description>Entries are IANA zone IDs, optionally 'Zone|Label' to give a custom display name.</description>
+    </key>
+    <key name="use-24h" type="b">
+      <default>true</default>
+      <summary>Use 24-hour time</summary>
+    </key>
+    <key name="show-offsets" type="b">
+      <default>true</default>
+      <summary>Show UTC offsets next to city names</summary>
+    </key>
+    <key name="bar-mode" type="s">
+      <choices>
+        <choice value="icon"/>
+        <choice value="time"/>
+      </choices>
+      <default>'icon'</default>
+      <summary>Bar button shows a globe icon or the first city's time</summary>
+    </key>
+  </schema>
+</schemalist>

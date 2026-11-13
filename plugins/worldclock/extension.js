@@ -1,0 +1,271 @@
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+
+// Curated zones for the in-menu "Manage locations" switch list.
+const ZONE_CATALOG = [
+    'Asia/Ho_Chi_Minh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo',
+    'Asia/Seoul', 'Asia/Shanghai', 'Asia/Hong_Kong', 'Asia/Kolkata',
+    'Asia/Dubai', 'Europe/London', 'Europe/Paris', 'Europe/Berlin',
+    'Europe/Moscow', 'America/New_York', 'America/Chicago',
+    'America/Los_Angeles', 'Australia/Sydney', 'Pacific/Auckland', 'UTC',
+];
+
+function splitLocation(entry) {
+    const idx = entry.indexOf('|');
+    const zoneId = idx === -1 ? entry : entry.slice(0, idx);
+    const name = idx === -1 ? prettyZone(zoneId) : entry.slice(idx + 1);
+    return {zoneId, name};
+}
+
+function prettyZone(zoneId) {
+    return zoneId === 'UTC' ? 'UTC' : zoneId.split('/').pop().replace(/_/g, ' ');
+}
+
+function offsetText(dateTime) {
+    const mins = Math.round(dateTime.get_utc_offset() / GLib.TIME_SPAN_MINUTE);
+    const sign = mins < 0 ? '-' : '+';
+    const abs = Math.abs(mins);
+    return `${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`;
+}
+
+// Whole days between the zone's local date and the user's local date:
+// 1 -> Tomorrow, -1 -> Yesterday, 0 -> Today.
+function dayDiff(zoneDate, localDate) {
+    const [zy, zm, zd] = zoneDate.get_ymd();
+    const [ly, lm, ld] = localDate.get_ymd();
+    const a = GLib.DateTime.new(GLib.TimeZone.new('UTC'), zy, zm, zd, 12, 0, 0);
+    const b = GLib.DateTime.new(GLib.TimeZone.new('UTC'), ly, lm, ld, 12, 0, 0);
+    return Math.round(a.difference(b) / GLib.TIME_SPAN_DAY);
+}
+
+const WorldClockIndicator = GObject.registerClass(
+class WorldClockIndicator extends PanelMenu.Button {
+    _init(extension) {
+        super._init(0.0, 'World Clock', false);
+        this._extension = extension;
+        this._settings = extension.getSettings();
+        this._rows = [];
+        this._tickCount = 0;
+
+        this._icon = new St.Icon({
+            icon_name: 'applications-internet-symbolic',
+            style_class: 'system-status-icon',
+        });
+        this._barLabel = new St.Label({
+            y_align: Clutter.ActorAlign.CENTER,
+            style: 'font-weight: bold;',
+        });
+        const box = new St.BoxLayout({style: 'spacing: 6px;'});
+        box.add_child(this._icon);
+        box.add_child(this._barLabel);
+        this.add_child(box);
+
+        this._buildMenu();
+
+        this._settingsChangedId = this._settings.connect('changed',
+            () => this._buildMenu());
+        this.menu.connect('open-state-changed', () => {
+            if (this.menu.isOpen)
+                this._refresh();
+        });
+
+        // Seconds tick keeps the clocks live while the menu is open; the
+        // bar label (first-city mode) follows every ~15 s.
+        this._refreshId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1,
+            () => {
+                this._tickCount = (this._tickCount + 1) % 15;
+                if (this.menu.isOpen || this._tickCount === 0)
+                    this._refresh();
+                return GLib.SOURCE_CONTINUE;
+            });
+        this._refresh();
+    }
+
+    _buildMenu() {
+        const menu = this.menu;
+        menu.removeAll();
+        this._rows = [];
+
+        const locations = this._settings.get_strv('locations');
+        if (locations.length === 0) {
+            const empty = new PopupMenu.PopupMenuItem('No locations — enable some in Manage locations', {reactive: false});
+            menu.addMenuItem(empty);
+        }
+
+        for (const entry of locations) {
+            const {zoneId, name} = splitLocation(entry);
+            let zone = null;
+            try {
+                zone = GLib.TimeZone.new(zoneId);
+            } catch {
+                zone = null;
+            }
+            if (!zone)
+                continue;
+
+            const row = new PopupMenu.PopupBaseMenuItem({reactive: false});
+            const nameLabel = new St.Label({text: name, y_align: Clutter.ActorAlign.CENTER});
+            nameLabel.x_expand = true;
+            const timeLabel = new St.Label({
+                text: '--:--',
+                y_align: Clutter.ActorAlign.CENTER,
+                style: 'font-weight: bold;',
+            });
+            const dayLabel = new St.Label({
+                text: '',
+                y_align: Clutter.ActorAlign.CENTER,
+                style: 'opacity: 0.6; font-size: 0.85em;',
+            });
+            row.add_child(nameLabel);
+            row.add_child(timeLabel);
+            row.add_child(dayLabel);
+            menu.addMenuItem(row);
+            this._rows.push({zone, name, timeLabel, dayLabel});
+        }
+
+        menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        // Meeting-time converter: type a time in the first city's zone and
+        // every row flips to show the matching local time there.
+        this._convertHeader = new PopupMenu.PopupMenuItem('', {reactive: false});
+        this._convertHeader.label.style = 'font-weight: bold;';
+        menu.addMenuItem(this._convertHeader);
+
+        const convertRow = new PopupMenu.PopupBaseMenuItem({reactive: false});
+        this._convertEntry = new St.Entry({
+            hint_text: 'e.g. 15:30 or 3:30 pm',
+            style_class: 'search-entry',
+            style: 'width: 210px;',
+            x_expand: true,
+        });
+        convertRow.add_child(this._convertEntry);
+        menu.addMenuItem(convertRow);
+        this._convertEntry.clutter_text.connect('text-changed', () => this._refresh());
+
+        menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        const display = new PopupMenu.PopupSubMenuMenuItem('Display');
+        menu.addMenuItem(display);
+        display.menu.addMenuItem(new PopupMenu.PopupSwitchMenuItem(
+            '24-hour time', this._settings.get_boolean('use-24h'),
+            item => this._settings.set_boolean('use-24h', item.state)));
+        display.menu.addMenuItem(new PopupMenu.PopupSwitchMenuItem(
+            'Show UTC offsets', this._settings.get_boolean('show-offsets'),
+            item => this._settings.set_boolean('show-offsets', item.state)));
+        display.menu.addMenuItem(new PopupMenu.PopupSwitchMenuItem(
+            'Show first city on the bar',
+            this._settings.get_string('bar-mode') === 'time',
+            item => this._settings.set_string('bar-mode', item.state ? 'time' : 'icon')));
+
+        const manage = new PopupMenu.PopupSubMenuMenuItem('Manage locations');
+        menu.addMenuItem(manage);
+        const current = new Set(locations.map(e => splitLocation(e).zoneId));
+        for (const zoneId of ZONE_CATALOG) {
+            const item = new PopupMenu.PopupSwitchMenuItem(prettyZone(zoneId), current.has(zoneId));
+            item.connect('toggled', it => {
+                const now = this._settings.get_strv('locations').slice();
+                const ids = now.map(e => splitLocation(e).zoneId);
+                if (it.state && !ids.includes(zoneId)) {
+                    this._settings.set_strv('locations', now.concat(zoneId));
+                } else if (!it.state && now.length > 1) {
+                    // Never let the list drop to zero cities.
+                    this._settings.set_strv('locations',
+                        now.filter(e => splitLocation(e).zoneId !== zoneId));
+                }
+            });
+            manage.menu.addMenuItem(item);
+        }
+
+        this._refresh();
+    }
+
+    _parseConvert() {
+        if (!this._convertEntry || !this._rows[0])
+            return null;
+        const text = this._convertEntry.text.trim();
+        const m = text.match(/^(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?$/i);
+        if (!m)
+            return null;
+        let hours = parseInt(m[1]);
+        const mins = m[2] ? parseInt(m[2]) : 0;
+        const ampm = m[3] ? m[3].toLowerCase() : null;
+        if (ampm === 'pm' && hours < 12)
+            hours += 12;
+        if (ampm === 'am' && hours === 12)
+            hours = 0;
+        if (hours > 23 || mins > 59)
+            return null;
+
+        const ref = this._rows[0];
+        const now = GLib.DateTime.now(ref.zone);
+        let dt = GLib.DateTime.new(ref.zone,
+            now.get_year(), now.get_month(), now.get_day_of_month(), hours, mins, 0);
+        if (dt.difference(now) < 0)
+            dt = dt.add_days(1);   // already past today -> the next occurrence
+        return {instant: dt,
+            text: `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`};
+    }
+
+    _refresh() {
+        const use24 = this._settings.get_boolean('use-24h');
+        const showOffsets = this._settings.get_boolean('show-offsets');
+        const fmt = use24 ? '%H:%M' : '%I:%M %p';
+        const localDate = GLib.DateTime.now_local();
+        const convert = this._parseConvert();
+
+        if (this._convertHeader) {
+            this._convertHeader.label.text = convert
+                ? `Meeting ${convert.text} in ${this._rows[0].name} →`
+                : 'Convert a meeting time (first city)';
+        }
+
+        for (const r of this._rows) {
+            const shown = convert ? convert.instant.to_timezone(r.zone) : GLib.DateTime.now(r.zone);
+            r.timeLabel.text = shown.format(fmt);
+            const diff = dayDiff(shown, localDate);
+            r.dayLabel.text = diff === 1 ? 'Tomorrow'
+                : diff === -1 ? 'Yesterday'
+                    : diff === 0 ? ''
+                        : diff > 1 ? `+${diff}d` : `${diff}d`;
+            r.nameLabel.text = showOffsets
+                ? `${r.name}  ${offsetText(shown)}` : r.name;
+        }
+
+        const mode = this._settings.get_string('bar-mode');
+        const first = this._rows[0];
+        this._icon.visible = mode !== 'time';
+        this._barLabel.visible = mode === 'time' && !!first;
+        if (first && mode === 'time')
+            this._barLabel.text = `${first.name} ${GLib.DateTime.now(first.zone).format(fmt)}`;
+    }
+});
+
+export default class WorldClockExtension extends Extension {
+    enable() {
+        this._indicator = new WorldClockIndicator(this);
+        // Center box, right next to the GNOME clock (which sits at index 0).
+        Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'center');
+    }
+
+    disable() {
+        if (!this._indicator)
+            return;
+        if (this._indicator._refreshId) {
+            GLib.source_remove(this._indicator._refreshId);
+            this._indicator._refreshId = 0;
+        }
+        if (this._indicator._settingsChangedId) {
+            this._indicator._settings.disconnect(this._indicator._settingsChangedId);
+            this._indicator._settingsChangedId = 0;
+        }
+        this._indicator.destroy();
+        this._indicator = null;
+    }
+}
