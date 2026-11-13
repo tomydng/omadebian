@@ -96,7 +96,7 @@ class WorldClockIndicator extends PanelMenu.Button {
             y_align: Clutter.ActorAlign.CENTER,
             style: 'font-weight: bold;',
         });
-        this._box = new St.BoxLayout({style: 'spacing: 6px;'});
+        this._box = new St.BoxLayout();
         this._box.add_child(this._icon);
         this._box.add_child(this._barLabel);
         this.add_child(this._box);
@@ -244,7 +244,11 @@ class WorldClockIndicator extends PanelMenu.Button {
         const iconSize = this._settings.get_int('icon-size');
         this._icon.style =
             `font-family: "CaskaydiaMono Nerd Font"; font-size: ${iconSize}px;`;
-        this._box.style = `padding-right: ${haloPad}px;`;
+        // Halo width via the box's spacing property (a plain GObject prop,
+        // honored exactly — unlike St CSS padding/width on these widgets).
+        // The always-present bar label acts as the trailing spacer: empty
+        // and zero-width in icon mode, real text in time mode.
+        this._box.spacing = haloPad;
         // Keep the popup arrow centered on the glyph, not the padded actor.
         this.menu._arrowAlignment = (iconSize / 2) / (iconSize + haloPad);
     }
@@ -277,10 +281,13 @@ class WorldClockIndicator extends PanelMenu.Button {
 
         const mode = this._settings.get_string('bar-mode');
         const first = this._rows[0];
-        this._icon.visible = mode !== 'time';
-        this._barLabel.visible = mode === 'time' && !!first;
+        // Always visible: an empty label keeps the box spacing alive, which
+        // is what gives the hover halo its width in icon mode.
+        this._barLabel.visible = true;
         if (first && mode === 'time')
             this._barLabel.text = `${first.name} ${GLib.DateTime.new_now(first.zone).format(fmt)}`;
+        else
+            this._barLabel.text = '';
     }
 });
 
