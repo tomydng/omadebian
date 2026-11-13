@@ -240,8 +240,14 @@ class WorldClockIndicator extends PanelMenu.Button {
 
     _applyBarStyles() {
         const iconSize = this._settings.get_int('icon-size');
+        const pillPad = this._settings.get_int('pill-padding');
         this._icon.style =
             `font-family: "CaskaydiaMono Nerd Font"; font-size: ${iconSize}px;`;
+        // Symmetric pill padding like every other panel button; the
+        // dateMenu button shrinks its own (see enable) so the pair stays
+        // snug even with a bigger pill.
+        this.style =
+            `-natural-hpadding: ${pillPad}px; -minimum-hpadding: ${pillPad}px;`;
         // Optically center the glyph: nerd-font glyphs have asymmetric
         // bearings (the drawing sits off-center inside its advance box).
         // translation_x is a pure paint offset — it cannot disturb layout,

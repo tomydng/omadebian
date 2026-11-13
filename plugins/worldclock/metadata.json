@@ -3,6 +3,6 @@
   "name": "World Clock",
   "description": "Offline world clock for the top bar: a globe button opens a popup with live clocks for configured IANA timezones, day-relative labels (Today/Tomorrow/Yesterday), 12/24-hour display, UTC offsets and a meeting-time converter. No network access.",
   "shell-version": ["48"],
-  "version": 11,
+  "version": 12,
   "settings-schema": "org.gnome.shell.extensions.worldclock"
 }

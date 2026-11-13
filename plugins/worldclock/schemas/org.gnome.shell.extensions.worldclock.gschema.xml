@@ -21,6 +21,11 @@
       <default>'icon'</default>
       <summary>Bar button shows a globe icon or the first city's time</summary>
     </key>
+    <key name="pill-padding" type="i">
+      <range min="0" max="20"/>
+      <default>7</default>
+      <summary>Hover pill padding in px (symmetric, like other panel buttons)</summary>
+    </key>
     <key name="icon-size" type="i">
       <range min="10" max="30"/>
       <default>15</default>
