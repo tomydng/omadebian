@@ -204,7 +204,7 @@ class WorldClockIndicator extends PanelMenu.Button {
             return null;
 
         const ref = this._rows[0];
-        const now = GLib.DateTime.now(ref.zone);
+        const now = GLib.DateTime.new_now(ref.zone);
         let dt = GLib.DateTime.new(ref.zone,
             now.get_year(), now.get_month(), now.get_day_of_month(), hours, mins, 0);
         if (dt.difference(now) < 0)
@@ -217,7 +217,7 @@ class WorldClockIndicator extends PanelMenu.Button {
         const use24 = this._settings.get_boolean('use-24h');
         const showOffsets = this._settings.get_boolean('show-offsets');
         const fmt = use24 ? '%H:%M' : '%I:%M %p';
-        const localDate = GLib.DateTime.now_local();
+        const localDate = GLib.DateTime.new_now_local();
         const convert = this._parseConvert();
 
         if (this._convertHeader) {
@@ -227,7 +227,7 @@ class WorldClockIndicator extends PanelMenu.Button {
         }
 
         for (const r of this._rows) {
-            const shown = convert ? convert.instant.to_timezone(r.zone) : GLib.DateTime.now(r.zone);
+            const shown = convert ? convert.instant.to_timezone(r.zone) : GLib.DateTime.new_now(r.zone);
             r.timeLabel.text = shown.format(fmt);
             const diff = dayDiff(shown, localDate);
             r.dayLabel.text = diff === 1 ? 'Tomorrow'
@@ -243,7 +243,7 @@ class WorldClockIndicator extends PanelMenu.Button {
         this._icon.visible = mode !== 'time';
         this._barLabel.visible = mode === 'time' && !!first;
         if (first && mode === 'time')
-            this._barLabel.text = `${first.name} ${GLib.DateTime.now(first.zone).format(fmt)}`;
+            this._barLabel.text = `${first.name} ${GLib.DateTime.new_now(first.zone).format(fmt)}`;
     }
 });
 
