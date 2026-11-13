@@ -28,8 +28,9 @@ function splitLocation(entry) {
 function prettyZone(zoneId) {
     if (zoneId === 'UTC')
         return 'UTC';
+    // tzdata has a single Vietnam zone; label it after the capital.
     if (zoneId === 'Asia/Ho_Chi_Minh')
-        return 'Ho Chi Minh City';
+        return 'Hà Nội';
     return zoneId.split('/').pop().replace(/_/g, ' ');
 }
 
@@ -90,7 +91,10 @@ class WorldClockIndicator extends PanelMenu.Button {
             gicon: Gio.FileIcon.new(Gio.File.new_for_path(
                 GLib.build_filenamev([extension.path, 'icons', 'globe.svg']))),
             style_class: 'system-status-icon',
+            style: 'margin-top: -1px;',   // optical nudge up
         });
+        // Sit closer to the GNOME clock on the left.
+        this.style = 'margin-right: -5px;';
         this._barLabel = new St.Label({
             y_align: Clutter.ActorAlign.CENTER,
             style: 'font-weight: bold;',

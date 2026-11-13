@@ -46,8 +46,8 @@ const KOLKATA = GLib.TimeZone.new('Asia/Kolkata');
 print('splitLocation / prettyZone');
 check("'Asia/Tokyo' → Tokyo",
     lib.splitLocation('Asia/Tokyo').name === 'Tokyo');
-check("'Asia/Ho_Chi_Minh' → Ho Chi Minh City",
-    lib.splitLocation('Asia/Ho_Chi_Minh').name === 'Ho Chi Minh City');
+check("'Asia/Ho_Chi_Minh' → Hà Nội",
+    lib.splitLocation('Asia/Ho_Chi_Minh').name === 'Hà Nội');
 check("custom label wins", lib.splitLocation('Asia/Tokyo|Tokyo HQ').name === 'Tokyo HQ');
 check("custom label keeps zone", lib.splitLocation('Asia/Tokyo|Tokyo HQ').zoneId === 'Asia/Tokyo');
 check('UTC stays UTC', lib.prettyZone('UTC') === 'UTC');
