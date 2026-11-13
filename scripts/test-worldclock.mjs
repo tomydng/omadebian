@@ -116,12 +116,14 @@ check('ZONE_CATALOG non-empty, all parse as zones',
 print('bar glyph (the Omarchy plugin uses nf-md-earth U+F059F)');
 check('glyph codepoint used in the bar button', src.includes('󰖟'),
     'extension.js should embed the literal nf-md-earth glyph');
-check('halo/gap knobs exposed as gsettings keys',
+check('icon-size knob exposed as a gsettings key',
     (() => {
         const xml = imports.byteArray.toString(
             GLib.file_get_contents(`${repoRoot}/plugins/worldclock/schemas/org.gnome.shell.extensions.worldclock.gschema.xml`)[1]);
-        return xml.includes('"halo-pad"') && xml.includes('"icon-size"');
+        return xml.includes('"icon-size"') && !xml.includes('"halo-pad"');
     })());
+check('clock-button tightening wired in enable()',
+    src.includes('statusArea.dateMenu'));
 check('old svg icon fully removed',
     !GLib.file_test(`${repoRoot}/plugins/worldclock/icons`, GLib.FileTest.EXISTS));
 

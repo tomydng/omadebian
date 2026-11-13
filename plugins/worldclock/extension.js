@@ -100,11 +100,10 @@ class WorldClockIndicator extends PanelMenu.Button {
         this._box.add_child(this._icon);
         this._box.add_child(this._barLabel);
         this.add_child(this._box);
-        // Zero button padding keeps the globe glued to the GNOME clock; the
-        // hover halo gets its width from internal padding instead (see
-        // _applyBarStyles) — positive values only, negative St margins
-        // corrupt allocations.
-        this.style = '-natural-hpadding: 0px; -minimum-hpadding: 0px;';
+        // Symmetric padding like every other panel button — the pill and the
+        // glyph stay centered, and the dateMenu button shrinks its own
+        // padding (see enable) so the pair still sits tight together.
+        this.style = '-natural-hpadding: 7px; -minimum-hpadding: 7px;';
 
         this._buildMenu();
 
@@ -240,17 +239,9 @@ class WorldClockIndicator extends PanelMenu.Button {
     }
 
     _applyBarStyles() {
-        const haloPad = this._settings.get_int('halo-pad');
         const iconSize = this._settings.get_int('icon-size');
         this._icon.style =
             `font-family: "CaskaydiaMono Nerd Font"; font-size: ${iconSize}px;`;
-        // Halo width via the box's spacing property (a plain GObject prop,
-        // honored exactly — unlike St CSS padding/width on these widgets).
-        // The always-present bar label acts as the trailing spacer: empty
-        // and zero-width in icon mode, real text in time mode.
-        this._box.spacing = haloPad;
-        // Keep the popup arrow centered on the glyph, not the padded actor.
-        this.menu._arrowAlignment = (iconSize / 2) / (iconSize + haloPad);
     }
 
     _refresh() {
@@ -296,6 +287,10 @@ export default class WorldClockExtension extends Extension {
         this._indicator = new WorldClockIndicator(this);
         // Center box, right next to the GNOME clock (which sits at index 0).
         Main.panel.addToStatusArea(this.uuid, this._indicator, 1, 'center');
+        // Shrink the clock button's padding so the globe sits tight against
+        // it while both keep symmetric, full-size hover pills.
+        Main.panel.statusArea.dateMenu?.set_style(
+            '-natural-hpadding: 1px; -minimum-hpadding: 1px;');
     }
 
     disable() {
