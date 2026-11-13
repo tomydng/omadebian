@@ -21,5 +21,15 @@
       <default>'icon'</default>
       <summary>Bar button shows a globe icon or the first city's time</summary>
     </key>
+    <key name="halo-pad" type="i">
+      <range min="0" max="40"/>
+      <default>12</default>
+      <summary>Hover halo width in px (internal padding right of the glyph)</summary>
+    </key>
+    <key name="icon-size" type="i">
+      <range min="10" max="30"/>
+      <default>15</default>
+      <summary>Glyph font size in px</summary>
+    </key>
   </schema>
 </schemalist>

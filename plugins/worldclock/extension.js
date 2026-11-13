@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -87,23 +86,25 @@ class WorldClockIndicator extends PanelMenu.Button {
         this._tickCount = 0;
 
         // Adwaita ships no globe symbolic, so the extension bundles its own.
-        this._icon = new St.Icon({
-            gicon: Gio.FileIcon.new(Gio.File.new_for_path(
-                GLib.build_filenamev([extension.path, 'icons', 'globe.svg']))),
-            style_class: 'system-status-icon',
+        // Same glyph the Omarchy plugin uses: nf-md-earth from the Nerd
+        // Font set (CaskaydiaMono ships it on this machine).
+        this._icon = new St.Label({
+            text: '󰖟',
+            y_align: Clutter.ActorAlign.CENTER,
         });
-        // Sit closer to the GNOME clock: shrink this button's horizontal
-        // padding (positive values only — negative margins corrupt St
-        // allocations with uint32-wrapped widths).
-        this.style = '-natural-hpadding: 2px; -minimum-hpadding: 2px;';
         this._barLabel = new St.Label({
             y_align: Clutter.ActorAlign.CENTER,
             style: 'font-weight: bold;',
         });
-        const box = new St.BoxLayout({style: 'spacing: 6px;'});
-        box.add_child(this._icon);
-        box.add_child(this._barLabel);
-        this.add_child(box);
+        this._box = new St.BoxLayout({style: 'spacing: 6px;'});
+        this._box.add_child(this._icon);
+        this._box.add_child(this._barLabel);
+        this.add_child(this._box);
+        // Zero button padding keeps the globe glued to the GNOME clock; the
+        // hover halo gets its width from internal padding instead (see
+        // _applyBarStyles) — positive values only, negative St margins
+        // corrupt allocations.
+        this.style = '-natural-hpadding: 0px; -minimum-hpadding: 0px;';
 
         this._buildMenu();
 
@@ -238,7 +239,18 @@ class WorldClockIndicator extends PanelMenu.Button {
         return parseConvertText(this._convertEntry.text, this._rows[0].zone);
     }
 
+    _applyBarStyles() {
+        const haloPad = this._settings.get_int('halo-pad');
+        const iconSize = this._settings.get_int('icon-size');
+        this._icon.style =
+            `font-family: "CaskaydiaMono Nerd Font"; font-size: ${iconSize}px;`;
+        this._box.style = `padding-right: ${haloPad}px;`;
+        // Keep the popup arrow centered on the glyph, not the padded actor.
+        this.menu._arrowAlignment = (iconSize / 2) / (iconSize + haloPad);
+    }
+
     _refresh() {
+        this._applyBarStyles();
         const use24 = this._settings.get_boolean('use-24h');
         const showOffsets = this._settings.get_boolean('show-offsets');
         const fmt = use24 ? '%H:%M' : '%I:%M %p';

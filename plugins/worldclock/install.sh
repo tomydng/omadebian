@@ -5,7 +5,6 @@ uuid='worldclock@tomydng.local'
 mkdir -p "$project_dir/dist"
 glib-compile-schemas --strict "$project_dir/schemas"
 gnome-extensions pack --force --out-dir="$project_dir/dist" \
-  --extra-source=icons \
   --schema=schemas/org.gnome.shell.extensions.worldclock.gschema.xml "$project_dir"
 
 # Expose the schema to the user schema source as well, so gsettings CLI

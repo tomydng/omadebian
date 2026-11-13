@@ -10,7 +10,6 @@
 // audited against the installed gnome-shell source instead.
 
 import GLib from 'gi://GLib';
-import Gio from 'gi://Gio';
 import System from 'system';
 
 const scriptPath = GLib.filename_from_uri(import.meta.url)[0];
@@ -114,18 +113,17 @@ check('ZONE_CATALOG non-empty, all parse as zones',
     lib.ZONE_CATALOG.length >= 15 &&
     lib.ZONE_CATALOG.every(z => GLib.TimeZone.new(z) !== null));
 
-print('bundled icon asset (Adwaita has no globe symbolic)');
-const iconPath = `${repoRoot}/plugins/worldclock/icons/globe.svg`;
-check('globe.svg ships with the plugin',
-    GLib.file_test(iconPath, GLib.FileTest.EXISTS));
-check('FileIcon constructible for it',
-    Gio.FileIcon.new(Gio.File.new_for_path(iconPath)) !== null);
-check('pack script bundles the icons dir',
+print('bar glyph (the Omarchy plugin uses nf-md-earth U+F059F)');
+check('glyph codepoint used in the bar button', src.includes('󰖟'),
+    'extension.js should embed the literal nf-md-earth glyph');
+check('halo/gap knobs exposed as gsettings keys',
     (() => {
-        const sh = imports.byteArray.toString(
-            GLib.file_get_contents(`${repoRoot}/plugins/worldclock/install.sh`)[1]);
-        return sh.includes('--extra-source=icons');
+        const xml = imports.byteArray.toString(
+            GLib.file_get_contents(`${repoRoot}/plugins/worldclock/schemas/org.gnome.shell.extensions.worldclock.gschema.xml`)[1]);
+        return xml.includes('"halo-pad"') && xml.includes('"icon-size"');
     })());
+check('old svg icon fully removed',
+    !GLib.file_test(`${repoRoot}/plugins/worldclock/icons`, GLib.FileTest.EXISTS));
 
 print('');
 if (failures > 0) {
