@@ -25,7 +25,11 @@ function splitLocation(entry) {
 }
 
 function prettyZone(zoneId) {
-    return zoneId === 'UTC' ? 'UTC' : zoneId.split('/').pop().replace(/_/g, ' ');
+    if (zoneId === 'UTC')
+        return 'UTC';
+    if (zoneId === 'Asia/Ho_Chi_Minh')
+        return 'Ho Chi Minh City';
+    return zoneId.split('/').pop().replace(/_/g, ' ');
 }
 
 function offsetText(dateTime) {
@@ -43,6 +47,32 @@ function dayDiff(zoneDate, localDate) {
     const a = GLib.DateTime.new(GLib.TimeZone.new('UTC'), zy, zm, zd, 12, 0, 0);
     const b = GLib.DateTime.new(GLib.TimeZone.new('UTC'), ly, lm, ld, 12, 0, 0);
     return Math.round(a.difference(b) / GLib.TIME_SPAN_DAY);
+}
+
+// Parse "15:30" / "3:30 pm" as a wall time in refZone. A time that has
+// already passed today rolls over to tomorrow (the next occurrence).
+// Returns {instant, text} or null for unparseable/out-of-range input.
+function parseConvertText(text, refZone) {
+    const m = text.trim().match(/^(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?$/i);
+    if (!m)
+        return null;
+    let hours = parseInt(m[1]);
+    const mins = m[2] ? parseInt(m[2]) : 0;
+    const ampm = m[3] ? m[3].toLowerCase() : null;
+    if (ampm === 'pm' && hours < 12)
+        hours += 12;
+    if (ampm === 'am' && hours === 12)
+        hours = 0;
+    if (hours > 23 || mins > 59)
+        return null;
+
+    const now = GLib.DateTime.new_now(refZone);
+    let dt = GLib.DateTime.new(refZone,
+        now.get_year(), now.get_month(), now.get_day_of_month(), hours, mins, 0);
+    if (dt.difference(now) < 0)
+        dt = dt.add_days(1);
+    return {instant: dt,
+        text: `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`};
 }
 
 const WorldClockIndicator = GObject.registerClass(
@@ -127,7 +157,7 @@ class WorldClockIndicator extends PanelMenu.Button {
             row.add_child(timeLabel);
             row.add_child(dayLabel);
             menu.addMenuItem(row);
-            this._rows.push({zone, name, timeLabel, dayLabel});
+            this._rows.push({zone, name, nameLabel, timeLabel, dayLabel});
         }
 
         menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -153,16 +183,24 @@ class WorldClockIndicator extends PanelMenu.Button {
 
         const display = new PopupMenu.PopupSubMenuMenuItem('Display');
         menu.addMenuItem(display);
-        display.menu.addMenuItem(new PopupMenu.PopupSwitchMenuItem(
-            '24-hour time', this._settings.get_boolean('use-24h'),
-            item => this._settings.set_boolean('use-24h', item.state)));
-        display.menu.addMenuItem(new PopupMenu.PopupSwitchMenuItem(
-            'Show UTC offsets', this._settings.get_boolean('show-offsets'),
-            item => this._settings.set_boolean('show-offsets', item.state)));
-        display.menu.addMenuItem(new PopupMenu.PopupSwitchMenuItem(
+        const use24Switch = new PopupMenu.PopupSwitchMenuItem(
+            '24-hour time', this._settings.get_boolean('use-24h'));
+        use24Switch.connect('toggled',
+            item => this._settings.set_boolean('use-24h', item.state));
+        display.menu.addMenuItem(use24Switch);
+
+        const offsetsSwitch = new PopupMenu.PopupSwitchMenuItem(
+            'Show UTC offsets', this._settings.get_boolean('show-offsets'));
+        offsetsSwitch.connect('toggled',
+            item => this._settings.set_boolean('show-offsets', item.state));
+        display.menu.addMenuItem(offsetsSwitch);
+
+        const barModeSwitch = new PopupMenu.PopupSwitchMenuItem(
             'Show first city on the bar',
-            this._settings.get_string('bar-mode') === 'time',
-            item => this._settings.set_string('bar-mode', item.state ? 'time' : 'icon')));
+            this._settings.get_string('bar-mode') === 'time');
+        barModeSwitch.connect('toggled', item =>
+            this._settings.set_string('bar-mode', item.state ? 'time' : 'icon'));
+        display.menu.addMenuItem(barModeSwitch);
 
         const manage = new PopupMenu.PopupSubMenuMenuItem('Manage locations');
         menu.addMenuItem(manage);
@@ -189,28 +227,7 @@ class WorldClockIndicator extends PanelMenu.Button {
     _parseConvert() {
         if (!this._convertEntry || !this._rows[0])
             return null;
-        const text = this._convertEntry.text.trim();
-        const m = text.match(/^(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?$/i);
-        if (!m)
-            return null;
-        let hours = parseInt(m[1]);
-        const mins = m[2] ? parseInt(m[2]) : 0;
-        const ampm = m[3] ? m[3].toLowerCase() : null;
-        if (ampm === 'pm' && hours < 12)
-            hours += 12;
-        if (ampm === 'am' && hours === 12)
-            hours = 0;
-        if (hours > 23 || mins > 59)
-            return null;
-
-        const ref = this._rows[0];
-        const now = GLib.DateTime.new_now(ref.zone);
-        let dt = GLib.DateTime.new(ref.zone,
-            now.get_year(), now.get_month(), now.get_day_of_month(), hours, mins, 0);
-        if (dt.difference(now) < 0)
-            dt = dt.add_days(1);   // already past today -> the next occurrence
-        return {instant: dt,
-            text: `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`};
+        return parseConvertText(this._convertEntry.text, this._rows[0].zone);
     }
 
     _refresh() {
