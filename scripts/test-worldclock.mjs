@@ -47,6 +47,10 @@ check("'Asia/Tokyo' → Tokyo",
     lib.splitLocation('Asia/Tokyo').name === 'Tokyo');
 check("'Asia/Ho_Chi_Minh' → Hà Nội",
     lib.splitLocation('Asia/Ho_Chi_Minh').name === 'Hà Nội');
+check("'America/Los_Angeles' → San Jose",
+    lib.splitLocation('America/Los_Angeles').name === 'San Jose');
+check("explicit label beats the zone default",
+    lib.splitLocation('America/Los_Angeles|LA Office').name === 'LA Office');
 check("custom label wins", lib.splitLocation('Asia/Tokyo|Tokyo HQ').name === 'Tokyo HQ');
 check("custom label keeps zone", lib.splitLocation('Asia/Tokyo|Tokyo HQ').zoneId === 'Asia/Tokyo');
 check('UTC stays UTC', lib.prettyZone('UTC') === 'UTC');

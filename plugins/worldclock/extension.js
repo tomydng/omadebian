@@ -30,6 +30,9 @@ function prettyZone(zoneId) {
     // tzdata has a single Vietnam zone; label it after the capital.
     if (zoneId === 'Asia/Ho_Chi_Minh')
         return 'Hà Nội';
+    // Same Pacific zone, but named after where the family actually is.
+    if (zoneId === 'America/Los_Angeles')
+        return 'San Jose';
     return zoneId.split('/').pop().replace(/_/g, ' ');
 }
 
