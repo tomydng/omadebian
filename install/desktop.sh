@@ -40,6 +40,9 @@ flatpak install -y flathub \
 run "$OMADEBIAN_PATH/install/desktop/app-lens-k8s.sh"
 run "$OMADEBIAN_PATH/install/desktop/app-localsend.sh"
 
+# Voice dictation: offline EN/VI (Cohere Transcribe on the local GPU)
+run "$OMADEBIAN_PATH/install/desktop/app-superwhisper.sh"
+
 # Ulauncher (app launcher)
 run "$OMADEBIAN_PATH/install/desktop/ulauncher.sh"
 
